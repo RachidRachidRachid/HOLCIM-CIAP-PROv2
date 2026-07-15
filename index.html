@@ -2,13 +2,14 @@
 <html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CIAP PRO v2 - Holcim Performance & Analytics</title>
+    <!-- Chart.js pour les graphiques interactifs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-primary: #080c14;
-            --bg-card: rgba(20, 30, 54, 0.6);
+            --bg-card: rgba(20, 30, 54, 0.7);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #ff5e13;
@@ -19,21 +20,29 @@
             --glass-glow: rgba(255, 94, 19, 0.15);
         }
 
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-primary);
-            background-image: radial-gradient(circle at top right, rgba(255, 94, 19, 0.05), transparent 400px);
+            background-image: radial-gradient(circle at top right, rgba(255, 94, 19, 0.05), transparent 350px);
             color: var(--text-main);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.2rem 2rem;
-            background: rgba(11, 15, 25, 0.8);
+            padding: 1rem;
+            background: rgba(11, 15, 25, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
@@ -41,117 +50,346 @@
             z-index: 100;
         }
 
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
 
-        /* Effet Glassmorphism */
+        .navbar-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            flex-grow: 1;
+        }
+
+        /* Glassmorphism rigide & responsive */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
-            border-radius: 16px;
-            padding: 2.5rem;
+            border-radius: 12px;
+            padding: 1.5rem;
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            margin-bottom: 2rem;
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+            width: 100%;
         }
 
-        .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 0.6rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        @media (min-width: 768px) {
+            .navbar { padding: 1.2rem 2rem; }
+            .navbar-brand { font-size: 1.4rem; }
+            .container { padding: 2rem 1.5rem; }
+            .card { padding: 2.5rem; margin-bottom: 2rem; }
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
 
         select, input {
-            padding: 0.9rem;
+            padding: 0.8rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            background: rgba(11, 15, 25, 0.6);
+            background: rgba(11, 15, 25, 0.8);
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s;
+            width: 100%;
         }
-        select:focus, input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px var(--glass-glow); }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 10px var(--glass-glow);
+        }
 
         .btn-primary {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 1rem;
+            padding: 0.9rem;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.2s;
+            width: 100%;
         }
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 5px 15px var(--glass-glow); }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
 
         .btn-secondary {
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--text-muted); }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
         /* Onglets d'administration */
-        .tab-nav { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.5rem 1rem; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
-        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
 
-        /* KPIs */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        /* Dashboard & Grid KPIs */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+        }
+
         .stat-card {
             background: linear-gradient(135deg, rgba(20, 30, 54, 0.8), rgba(11, 15, 25, 0.8));
-            padding: 1.8rem;
+            padding: 1.2rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             text-align: center;
         }
-        .stat-card h3 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-        .stat-card p { font-size: 2.2rem; font-weight: 800; margin: 0.6rem 0 0; color: var(--accent); text-shadow: 0 0 10px var(--glass-glow); }
 
-        /* Graphiques */
-        .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .chart-wrapper { background: rgba(11, 15, 25, 0.5); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); min-height: 250px; }
+        .stat-card h3 {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
 
-        /* Tableaux */
-        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(11, 15, 25, 0.4); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        th { background: rgba(20, 30, 54, 0.9); padding: 1rem; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-muted); }
-        td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
-        tr:hover { background: rgba(255, 94, 19, 0.03); }
+        .stat-card p {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0.4rem 0 0;
+            color: var(--accent);
+        }
 
-        .badge { padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        @media (min-width: 768px) {
+            .stat-card { padding: 1.8rem; }
+            .stat-card h3 { font-size: 0.75rem; }
+            .stat-card p { font-size: 2.2rem; }
+        }
+
+        /* Graphiques Ajustés */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .charts-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+        }
+
+        .chart-wrapper {
+            background: rgba(11, 15, 25, 0.5);
+            padding: 1.2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            height: 260px; /* Force la hauteur pour bloquer les sauts d'affichage */
+            position: relative;
+        }
+
+        /* Configuration de session adaptative */
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .setup-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* Tableaux avec défilement propre */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(11, 15, 25, 0.4);
+            margin-top: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+            min-width: 600px; /* Empêche le tassement des données */
+        }
+
+        th {
+            background: rgba(20, 30, 54, 0.95);
+            padding: 0.8rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
         .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
         .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* Questions de Test */
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
-        .option-btn { background: rgba(11, 15, 25, 0.6); border: 1px solid var(--border-color); padding: 1.2rem; border-radius: 8px; text-align: left; color: inherit; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        .option-btn:hover, .option-btn.selected { border-color: var(--accent); background: rgba(255, 94, 19, 0.08); box-shadow: 0 0 10px var(--glass-glow); }
-        
-        .progress-bar { background: var(--border-color); height: 6px; border-radius: 3px; overflow: hidden; margin: 1.5rem 0; }
-        #progressFill { background: var(--accent); height: 100%; width: 0%; transition: width 0.3s; }
+        /* Écran d'examen fixe et centré */
+        #examScreen {
+            max-width: 650px;
+            margin: 1rem auto;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+        }
+
+        .option-btn {
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: left;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        .option-btn:hover, .option-btn.selected {
+            border-color: var(--accent);
+            background: rgba(255, 94, 19, 0.08);
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        #progressFill {
+            background: var(--accent);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
 
         .hidden { display: none !important; }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin: 1.5rem auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <header class="navbar">
-        <div style="font-weight: 900; font-size: 1.4rem; letter-spacing: 1px;">🏭 HOLCIM <span style="color: var(--accent);">CIAP ANALYTICS</span></div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-            <button id="adminLoginBtn" class="btn-secondary">⚙️ Admin Portal</button>
-            <div id="userProfile" style="font-weight: 500; color: var(--text-muted);">Non connecté</div>
+        <div class="navbar-brand">🏭 HOLCIM <span style="color: var(--accent);">CIAP ANALYTICS</span></div>
+        <div class="navbar-actions">
+            <button id="adminLoginBtn" class="btn-secondary">⚙️ Admin</button>
+            <div id="userProfile" style="font-size: 0.8rem; display: none;"></div>
         </div>
     </header>
 
     <main class="container">
         
+        <!-- ÉCRAN 1 : CONNEXION SÉCURISÉE -->
         <section id="loginScreen" class="card">
-            <h2 style="margin-top:0; font-weight: 800; letter-spacing: -0.5px;">Espace d'Évaluation CIAP</h2>
-            <p style="color: var(--text-muted); margin-top:-10px; margin-bottom: 2rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
+            <h2 style="margin-top:0; font-weight: 800; font-size:1.5rem; margin-bottom:0.5rem;">Espace d'Évaluation CIAP</h2>
+            <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
             <form id="loginForm">
                 <div class="form-group">
                     <label>Nom de l'audité</label>
@@ -161,56 +399,61 @@
                     <label>Prénom</label>
                     <input type="text" id="firstName" required placeholder="Ex: Mohamed">
                 </div>
-                <button type="submit" class="btn-primary">Charger l'application</button>
+                <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Charger l'application</button>
             </form>
         </section>
 
+        <!-- PORTAL ADMIN : PIN CODE -->
         <section id="adminAuthScreen" class="card hidden">
-            <h3>🔐 Accès Administration</h3>
+            <h3 style="margin-bottom:1rem;">🔐 Accès Administration</h3>
             <div class="form-group">
                 <label>Code PIN d'administration</label>
                 <input type="password" id="adminPin" placeholder="Entrez le code...">
             </div>
-            <div style="display:flex; gap:1rem;">
+            <div style="display:flex; gap:0.8rem;">
                 <button id="verifyAdminBtn" class="btn-primary" style="flex:1;">Valider</button>
-                <button id="closeAdminAuthBtn" class="btn-secondary">Annuler</button>
+                <button id="closeAdminAuthBtn" class="btn-secondary" style="flex:1;">Annuler</button>
             </div>
         </section>
 
+        <!-- CHARGEMENT -->
         <section id="loadingScreen" class="card hidden" style="text-align: center;">
             <div class="loading-spinner"></div>
-            <h3>Synchronisation sécurisée...</h3>
-            <p style="color:var(--text-muted);">Chargement en temps réel des données d'évaluation.</p>
+            <h3 style="font-size:1.1rem; margin-top:1rem;">Synchronisation sécurisée...</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Chargement en temps réel des données d'évaluation.</p>
         </section>
 
+        <!-- ÉCRAN 2 : PORTAIL PRINCIPAL (DASHBOARD ANALYTICS ET KPI) -->
         <section id="dashboardScreen" class="hidden">
             <div class="dashboard-grid">
-                <div class="stat-card"><h3>Audits Réalisés</h3><p id="kpiTotal">0</p></div>
-                <div class="stat-card"><h3>Conformité Globale</h3><p id="kpiPassRate" style="color: var(--success);">0%</p></div>
-                <div class="stat-card"><h3>Moyenne d'usine</h3><p id="kpiAvgScore">0%</p></div>
-                <div class="stat-card"><h3>Questions Actives</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
+                <div class="stat-card"><h3>Audits</h3><p id="kpiTotal">0</p></div>
+                <div class="stat-card"><h3>Conformité</h3><p id="kpiPassRate" style="color: var(--success);">0%</p></div>
+                <div class="stat-card"><h3>Moyenne</h3><p id="kpiAvgScore">0%</p></div>
+                <div class="stat-card"><h3>Questions</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
             </div>
 
+            <!-- Graphiques Interactifs -->
             <div class="charts-container">
                 <div class="chart-wrapper">
-                    <h4 style="margin-top:0; color:var(--text-muted);">Conformité par Secteur</h4>
+                    <h4 style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Conformité par Secteur</h4>
                     <canvas id="domaineChart"></canvas>
                 </div>
                 <div class="chart-wrapper">
-                    <h4 style="margin-top:0; color:var(--text-muted);">Répartition des Décisions</h4>
+                    <h4 style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Répartition des Décisions</h4>
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
 
+            <!-- Configuration de Session -->
             <div class="card">
-                <h3 style="margin-top:0;">🛠️ Initialisation de la Session de Contrôle</h3>
+                <h3 style="margin-top:0; font-size:1.2rem; margin-bottom:1rem;">🛠️ Initialisation du Test</h3>
                 <div class="setup-grid">
                     <div class="form-group">
                         <label>Périmètre d'audit</label>
                         <select id="cfgDomaine"></select>
                     </div>
                     <div class="form-group">
-                        <label>Nombre de questions requises</label>
+                        <label>Nombre de questions</label>
                         <select id="cfgNb">
                             <option value="5" selected>5 Questions</option>
                             <option value="10">10 Questions</option>
@@ -223,17 +466,19 @@
             </div>
         </section>
 
+        <!-- PANNEAU D'ADMINISTRATION : 2 TABLEAUX DISTINCTS -->
         <section id="adminDashboardScreen" class="card hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-                <h2 style="margin:0;">⚙️ Console d'Administration Supérieure</h2>
-                <button id="exitAdminBtn" class="btn-secondary">Quitter l'administration</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+                <h2 style="margin:0; font-size:1.2rem;">⚙️ Console d'Administration</h2>
+                <button id="exitAdminBtn" class="btn-secondary">Quitter</button>
             </div>
 
             <div class="tab-nav">
-                <button id="tabResultsBtn" class="tab-btn active">📊 Historique des Audités (Tableau 1)</button>
-                <button id="tabQuestionsBtn" class="tab-btn">📋 Banque de Questions Active (Tableau 2)</button>
+                <button id="tabResultsBtn" class="tab-btn active">📊 Historique Audités</button>
+                <button id="tabQuestionsBtn" class="tab-btn">📋 Banque Questions</button>
             </div>
 
+            <!-- TABLEAU 1 : RÉSULTATS DES AUDITÉS -->
             <div id="adminTableResults" class="table-responsive">
                 <table>
                     <thead>
@@ -242,7 +487,7 @@
                             <th>Nom & Prénom</th>
                             <th>Domaine d'Évaluation</th>
                             <th>Score Réalisé</th>
-                            <th>Verdict de Conformité</th>
+                            <th>Verdict</th>
                             <th>Durée</th>
                         </tr>
                     </thead>
@@ -250,6 +495,7 @@
                 </table>
             </div>
 
+            <!-- TABLEAU 2 : BANQUE DE QUESTIONS ACTIVE -->
             <div id="adminTableQuestions" class="table-responsive hidden">
                 <table>
                     <thead>
@@ -257,7 +503,7 @@
                             <th>Domaine</th>
                             <th>Intitulé de la Question</th>
                             <th>Options Possibles</th>
-                            <th>Index de Réponse</th>
+                            <th>Index Réponse</th>
                             <th>Temps Limite</th>
                         </tr>
                     </thead>
@@ -266,29 +512,32 @@
             </div>
         </section>
 
+        <!-- ÉCRAN 3 : TEST ACTIF (DESIGN NETTOYÉ ET ULTRA-RESPONSIVE) -->
         <section id="examScreen" class="card hidden">
             <div class="exam-header">
-                <div><span class="badge badge-success" id="lblDomaine" style="color:var(--accent); border-color:var(--accent);">--</span></div>
+                <div><span class="badge" id="lblDomaine" style="color:var(--accent); border:1px solid var(--accent);">--</span></div>
                 <div><span id="questionTimer" class="badge badge-danger">--s</span></div>
             </div>
             <div class="progress-bar"><div id="progressFill"></div></div>
             <div id="questionBox">
-                <h3 id="questionText" style="line-height:1.5; font-size:1.4rem; margin-top:1rem;">--</h3>
+                <h3 id="questionText" style="line-height:1.4; font-size:1.15rem; margin:1rem 0;">--</h3>
                 <div id="optionsContainer" class="options-grid"></div>
             </div>
-            <button id="btnNext" class="btn-primary" style="margin-top:2.5rem;">Soumettre la réponse</button>
+            <button id="btnNext" class="btn-primary" style="margin-top:2rem;">Soumettre la réponse</button>
         </section>
 
-        <section id="reportScreen" class="card hidden" style="text-align: center;">
-            <h2 style="color:var(--success)">📝 Protocole d'Évaluation Terminé</h2>
-            <p style="color:var(--text-muted)">Le cryptage de vos données de performance a été écrit avec succès.</p>
-            <div class="dashboard-grid" style="margin-top:2.5rem;">
-                <div class="card stat-card"><h3>Score Certifié</h3><p id="repScore">--%</p></div>
-                <div class="card stat-card"><h3>Verdict</h3><p id="repStatus">--</p></div>
+        <!-- ÉCRAN 4 : SYNCHRONISATION & SCORE -->
+        <section id="reportScreen" class="card hidden" style="text-align: center; max-width: 500px; margin: 2rem auto;">
+            <h2 style="color:var(--success); font-size:1.5rem; margin-bottom:0.5rem;">📝 Évaluation Terminée</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Données enregistrées avec succès.</p>
+            <div class="dashboard-grid">
+                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3>Score Certifié</h3><p id="repScore">--%</p></div>
+                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3>Verdict</h3><p id="repStatus">--</p></div>
             </div>
-            <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1.5rem;">Fermer et retourner à la console</button>
+            <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1rem; padding: 0.8rem;">Retourner à la console</button>
         </section>
 
+        <!-- SÉCURITÉ TRANSMISSION CACHÉE -->
         <iframe name="syncFrame" class="hidden" style="display:none;"></iframe>
         <form id="googleSyncForm" method="POST" action="https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec" target="syncFrame" class="hidden" style="display:none;">
             <input type="hidden" name="user" id="postUser">
@@ -310,9 +559,8 @@
         let answersUser = [];
         let timerQ, secQ, secG, timerG;
         
-        let chartD, chartS; // Variables des instances Chart.js
+        let chartD, chartS;
 
-        // GESTIONNAIRE D'ACCÈS PORTAL ADMIN
         document.getElementById('adminLoginBtn').addEventListener('click', () => {
             document.getElementById('adminAuthScreen').classList.toggle('hidden');
         });
@@ -338,7 +586,6 @@
             document.getElementById('dashboardScreen').classList.remove('hidden');
         });
 
-        // ONGLET INTERNE ADMIN
         document.getElementById('tabResultsBtn').addEventListener('click', () => {
             document.getElementById('tabResultsBtn').classList.add('active');
             document.getElementById('tabQuestionsBtn').classList.remove('active');
@@ -353,13 +600,15 @@
             document.getElementById('adminTableResults').classList.add('hidden');
         });
 
-        // SYNCHRONISATION GLOBALE API ET CALCUL KPI & GRAPHES
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nom = document.getElementById('lastName').value.trim().toUpperCase();
             const prenom = document.getElementById('firstName').value.trim();
             userNameFormatted = prenom + " " + nom;
-            document.getElementById('userProfile').innerText = "👤 " + userNameFormatted;
+            
+            const profileDiv = document.getElementById('userProfile');
+            profileDiv.innerText = "👤 " + userNameFormatted;
+            profileDiv.style.display = "block";
 
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
@@ -371,12 +620,9 @@
                 serverQuestions = data.questions || [];
                 rawHistory = data.resultats || [];
 
-                // Remplir tableau de bord
                 buildKPIs(rawHistory);
                 buildCharts(rawHistory);
                 buildSelectors();
-                
-                // Remplir les deux tableaux d'administration
                 buildAdminTables(rawHistory, serverQuestions);
 
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -389,7 +635,6 @@
             }
         });
 
-        // CONFIGURATION DES KPIs ET STATS
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
@@ -410,13 +655,10 @@
             document.getElementById('statQuestionsCount').innerText = serverQuestions.length;
         }
 
-        // COMPILATION INTERACTIVE DES GRAPHIQUES (CHART.JS)
         function buildCharts(history) {
-            // Détruire les instances si elles existent déjà pour éviter le glitch au rechargement
             if (chartD) chartD.destroy();
             if (chartS) chartS.destroy();
 
-            // Graphique 1 : Scores par Domaine
             const scoresParDomaine = {};
             const countParDomaine = {};
             history.forEach(r => {
@@ -452,7 +694,6 @@
                 }
             });
 
-            // Graphique 2 : Ratio de Conformité
             let conforme = 0, reformer = 0;
             history.forEach(r => {
                 if(r.verdict === "CONFORME") conforme++;
@@ -473,12 +714,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff', boxWidth: 12 } } }
                 }
             });
         }
 
-        // CHARGEMENT DES COMPOSANTS DE CONFIGURATION
         function buildSelectors() {
             const domaines = new Set();
             domaines.add("Tous les domaines (Mixte)");
@@ -493,9 +733,7 @@
             });
         }
 
-        // REMPLISSAGE DES DEUX TABLEAUX D'ADMINISTRATION (TABLEAU 1 & TABLEAU 2)
         function buildAdminTables(history, questions) {
-            // Tableau 1 : Résultats des audités
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
             [...history].reverse().forEach(r => {
@@ -512,7 +750,6 @@
                 tResult.appendChild(row);
             });
 
-            // Tableau 2 : Banque de Questions Active
             const tQuest = document.getElementById('adminQuestionsBody');
             tQuest.innerHTML = "";
             questions.forEach((q, idx) => {
@@ -528,7 +765,6 @@
             });
         }
 
-        // EXECUTION DE L'EXAMEN
         document.getElementById('btnStartExam').addEventListener('click', () => {
             const selectDom = document.getElementById('cfgDomaine').value;
             const sizeCfg = document.getElementById('cfgNb').value;
@@ -547,6 +783,9 @@
             indexQ = 0; answersUser = []; secG = 0;
             document.getElementById('dashboardScreen').classList.add('hidden');
             document.getElementById('examScreen').classList.remove('hidden');
+            
+            // Défilement automatique vers le haut du test pour éviter les sauts d'affichage
+            window.scrollTo({top: 0, behavior: 'smooth'});
             
             timerG = setInterval(() => { secG++; }, 1000);
             showQuestion();
@@ -597,7 +836,6 @@
             showQuestion();
         }
 
-        // ENVOI TRANSPARENT DANS L'IFRAME CACHÉE
         function endExamAndSync() {
             clearInterval(timerQ); clearInterval(timerG);
 
@@ -607,17 +845,14 @@
             const statut = score >= 75 ? "CONFORME" : "À REFORMER";
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
-            // Préparation du formulaire
             document.getElementById('postUser').value = userNameFormatted;
             document.getElementById('postDomaine').value = document.getElementById('cfgDomaine').value;
             document.getElementById('postScore').value = score;
             document.getElementById('postStatut').value = statut;
             document.getElementById('postTemps').value = tempsTotalStr;
 
-            // Envoi transparent sans page noire
             document.getElementById('googleSyncForm').submit();
 
-            // Intégrer localement les nouvelles données pour que l'audité les voit sur ses graphes après le test
             const now = new Date();
             const dynamicDateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
@@ -630,12 +865,10 @@
                 temps: tempsTotalStr
             });
 
-            // Re-génération des KPI et des Graphiques
             buildKPIs(rawHistory);
             buildCharts(rawHistory);
             buildAdminTables(rawHistory, serverQuestions);
 
-            // Redirection vers le score
             document.getElementById('examScreen').classList.add('hidden');
             document.getElementById('reportScreen').classList.remove('hidden');
 
