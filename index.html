@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIAP - Holcim Professional Audit</title>
+    <style>
+        :root[data-theme="dark"] { --bg-primary: #0b0f19; --bg-card: #141c2f; --text-main: #f8fafc; --accent: #ff5e13; --border-color: #22314d; --success: #10b981; }
+        body { margin: 0; font-family: sans-serif; background-color: var(--bg-primary); color: var(--text-main); }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: var(--bg-card); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .btn-primary { background: var(--accent); color: white; border: none; padding: 1rem; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--border-color); padding: 1rem; border-radius: 8px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.8rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login -->
+        <section id="loginScreen" class="card">
+            <h2>Identification</h2>
+            <form id="loginForm">
+                <input type="text" id="lastName" placeholder="NOM" required style="width:100%; padding:10px; margin-bottom:10px;">
+                <input type="text" id="firstName" placeholder="Prénom" required style="width:100%; padding:10px; margin-bottom:10px;">
+                <button type="submit" class="btn-primary">Charger Audit & KPI</button>
+            </form>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboardScreen" class="card hidden">
+            <h2>Tableau de bord</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card"><h3>Audits</h3><p id="kpiTotal">0</p></div>
+                <div class="stat-card"><h3>Score Moyen</h3><p id="kpiAvgScore">0%</p></div>
+            </div>
+            <button id="btnStart" class="btn-primary" style="margin-bottom:20px;">Démarrer un nouvel audit</button>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Date</th><th>Audité</th><th>Score</th><th>Verdict</th></tr></thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Formulaire de soumission invisible -->
+        <iframe name="syncFrame" class="hidden"></iframe>
+        <form id="googleSyncForm" method="POST" action="https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec" target="syncFrame" class="hidden">
+            <input type="hidden" name="user" id="postUser">
+            <input type="hidden" name="domaine" id="postDomaine">
+            <input type="hidden" name="score" id="postScore">
+            <input type="hidden" name="statut" id="postStatut">
+            <input type="hidden" name="temps" id="postTemps">
+        </form>
+    </div>
+
+    <script>
+        const API = "https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec";
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('loginScreen').classList.add('hidden');
+            const res = await fetch(API);
+            const data = await res.json();
+            
+            // Mise à jour KPI
+            document.getElementById('kpiTotal').innerText = data.resultats.length;
+            const avg = data.resultats.reduce((acc, curr) => acc + parseInt(curr.score), 0) / data.resultats.length;
+            document.getElementById('kpiAvgScore').innerText = Math.round(avg || 0) + "%";
+            
+            // Remplissage tableau
+            const tbody = document.getElementById('historyBody');
+            data.resultats.slice(-10).reverse().forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.horodatage}</td><td>${r.audite}</td><td>${r.score}%</td><td>${r.verdict}</td></tr>`;
+            });
+            
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
