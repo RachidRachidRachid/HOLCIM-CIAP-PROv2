@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO</title>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -58,7 +57,7 @@
             text-align: right;
         }
 
-        /* En-tête Haute Performance */
+        /* En-tête */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -84,9 +83,16 @@
             gap: 1.5rem;
         }
 
-        .logo-img {
-            height: 45px;
-            object-fit: contain;
+        /* Logo Holcim Stylisé & Dynamique */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            height: 50px;
+        }
+        .logo-svg {
+            height: 100%;
+            width: auto;
+            max-width: 220px;
         }
 
         .header-title-container h1 {
@@ -168,6 +174,7 @@
 
         [data-theme="light"] select, [data-theme="light"] input, [data-theme="light"] textarea {
             background: #f8fafc;
+            color: #0e3156;
         }
 
         select:focus, input:focus, textarea:focus {
@@ -297,6 +304,7 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             background: rgba(10, 15, 29, 0.4);
+            margin-top: 1rem;
         }
 
         table {
@@ -337,7 +345,7 @@
         .badge-success { background: rgba(140, 185, 41, 0.2); color: var(--success); border: 1px solid var(--success); }
         .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* Pied de Page Exigé */
+        /* Pied de Page */
         footer {
             background: rgba(10, 15, 29, 0.98);
             border-top: 3px solid var(--holcim-green);
@@ -346,7 +354,9 @@
             margin-top: auto;
         }
 
-        .footer-logo {
+        .footer-logo-container {
+            display: flex;
+            justify-content: center;
             height: 35px;
             margin-bottom: 1rem;
         }
@@ -362,6 +372,27 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             letter-spacing: 0.5px;
+        }
+
+        /* Onglets */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--holcim-blue-light);
+            border-bottom: 3px solid var(--holcim-blue-light);
         }
 
         /* Styles d'examen */
@@ -426,7 +457,29 @@
 
     <header class="navbar">
         <div class="navbar-brand-group">
-            <img src="arie transparent.png" alt="Holcim Logo" class="logo-img">
+            <div class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 450 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#009cd9" />
+                            <stop offset="100%" stop-color="#154273" />
+                        </linearGradient>
+                        <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8cb929" />
+                            <stop offset="100%" stop-color="#009cd9" />
+                        </linearGradient>
+                        <style>
+                            .logo-text { font-family: 'Segoe UI', Roboto, sans-serif; font-weight: 800; font-size: 78px; fill: #154273; }
+                            [data-theme="dark"] .logo-text { fill: #f8fafc; }
+                        </style>
+                    </defs>
+                    <g transform="translate(10, 10)">
+                        <path d="M 50,20 A 30,30 0 0,1 80,50 L 80,65 L 60,65 L 60,50 A 10,10 0 0,0 50,40 A 10,10 0 0,0 40,50 L 40,65 L 20,65 L 20,50 A 30,30 0 0,1 50,20 Z" fill="url(#gradient-blue)" />
+                        <path d="M 50,80 A 30,30 0 0,1 20,50 L 20,35 L 40,35 L 40,50 A 10,10 0 0,0 50,60 A 10,10 0 0,0 60,50 L 60,35 L 80,35 L 80,50 A 30,30 0 0,1 50,80 Z" fill="url(#gradient-green)" />
+                    </g>
+                    <text x="120" y="85" class="logo-text">HOLCIM</text>
+                </svg>
+            </div>
             <div class="header-title-container">
                 <h1 data-i18n="main_title">TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO</h1>
                 <p data-i18n="main_subtitle">Système Intégré de Suivi et de Certification de Compétence</p>
@@ -446,7 +499,6 @@
 
     <main class="container">
         
-        <!-- ÉCRAN 1 : CONNEXION SÉCURISÉE -->
         <section id="loginScreen" class="card">
             <h2 data-i18n="login_title" style="font-size: 1.8rem; font-weight: 850; margin-bottom: 0.5rem;">Espace d'Évaluation CIAP</h2>
             <p data-i18n="login_sub" style="color: var(--text-muted); margin-bottom: 2rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
@@ -463,7 +515,6 @@
             </form>
         </section>
 
-        <!-- PORTAL ADMIN : PIN CODE -->
         <section id="adminAuthScreen" class="card hidden">
             <h3 data-i18n="admin_auth_title" style="margin-bottom:1.5rem;">🔐 Accès Administration</h3>
             <div class="form-group">
@@ -476,14 +527,12 @@
             </div>
         </section>
 
-        <!-- CHARGEMENT -->
         <section id="loadingScreen" class="card hidden" style="text-align: center;">
             <div class="loading-spinner"></div>
             <h3 data-i18n="loading_title" style="font-size:1.2rem; margin-top:1rem;">Synchronisation bidirectionnelle sécurisée...</h3>
             <p data-i18n="loading_sub" style="color:var(--text-muted); font-size:0.9rem;">Mise à jour en temps réel avec le serveur Google Sheets.</p>
         </section>
 
-        <!-- ÉCRAN 2 : PORTAIL PRINCIPAL (DASHBOARD ANALYTICS ET KPI) -->
         <section id="dashboardScreen" class="hidden">
             <div class="dashboard-grid">
                 <div class="stat-card"><h3 data-i18n="kpi_audits">Audits</h3><p id="kpiTotal">0</p></div>
@@ -492,7 +541,6 @@
                 <div class="stat-card"><h3 data-i18n="kpi_questions">Questions</h3><p id="statQuestionsCount" style="color: var(--holcim-blue-light);">0</p></div>
             </div>
 
-            <!-- Graphiques Interactifs -->
             <div class="charts-container">
                 <div class="chart-wrapper">
                     <h4 data-i18n="chart_domain" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px; text-transform:uppercase; font-weight: 800;">Conformité par Secteur</h4>
@@ -504,7 +552,6 @@
                 </div>
             </div>
 
-            <!-- Configuration de Session -->
             <div class="card">
                 <h3 data-i18n="setup_title" style="margin-top:0; font-size:1.3rem; margin-bottom:1.5rem;">🛠️ Initialisation du Test</h3>
                 <div class="setup-grid" style="display: grid; grid-template-columns: 1fr; gap:1.5rem; margin-bottom:1.5rem;">
@@ -526,7 +573,6 @@
             </div>
         </section>
 
-        <!-- PANNEAU D'ADMINISTRATION : GESTION COMPLETE (BI-DIRECTIONNELLE) -->
         <section id="adminDashboardScreen" class="card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:15px;">
                 <h2 data-i18n="admin_title" style="margin:0; font-size:1.5rem; font-weight: 850;">⚙️ Console d'Administration</h2>
@@ -536,10 +582,10 @@
                 </div>
             </div>
 
-            <!-- MODAL / FORMULAIRE AJOUT & MODIFICATION QUESTION -->
-            <div id="questionFormContainer" class="card hidden" style="background: rgba(10,15,29,0.9); border-color: var(--holcim-blue-light); margin-bottom: 2rem;">
+            <div id="questionFormContainer" class="card hidden" style="background: rgba(10,15,29,0.95); border-color: var(--holcim-blue-light); margin-bottom: 2rem;">
                 <h3 id="formQuestionTitle" style="color: var(--holcim-blue-light); font-weight: 800;">Ajouter une Nouvelle Question</h3>
                 <input type="hidden" id="editQuestionIdx" value="">
+                
                 <div class="form-group" style="margin-top: 1.5rem;">
                     <label>Domaine</label>
                     <input type="text" id="formDomaine" placeholder="Ex: CIMENT / SECURITE">
@@ -566,12 +612,11 @@
                 </div>
             </div>
 
-            <div class="tab-nav" style="display:flex; gap:10px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                <button id="tabResultsBtn" class="btn-secondary" style="border-bottom: 3px solid var(--holcim-blue-light); border-radius:0;">📊 Historique Audités</button>
-                <button id="tabQuestionsBtn" class="btn-secondary" style="border-radius:0;">📋 Banque Questions</button>
+            <div class="tab-nav">
+                <button id="tabResultsBtn" class="tab-btn active">📊 Historique Audités</button>
+                <button id="tabQuestionsBtn" class="tab-btn">📋 Banque Questions</button>
             </div>
 
-            <!-- TABLEAU 1 : RÉSULTATS DES AUDITÉS -->
             <div id="adminTableResults" class="table-responsive">
                 <table>
                     <thead>
@@ -589,7 +634,6 @@
                 </table>
             </div>
 
-            <!-- TABLEAU 2 : BANQUE DE QUESTIONS ACTIVE -->
             <div id="adminTableQuestions" class="table-responsive hidden">
                 <table>
                     <thead>
@@ -607,7 +651,6 @@
             </div>
         </section>
 
-        <!-- ÉCRAN 3 : TEST ACTIF -->
         <section id="examScreen" class="card hidden">
             <div class="exam-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <div><span class="badge" id="lblDomaine" style="color:var(--holcim-blue-light); border:1.5px solid var(--holcim-blue-light);">--</span></div>
@@ -621,7 +664,6 @@
             <button id="btnNext" class="btn-primary" style="margin-top:2.5rem; width: 100%;" data-i18n="btn_submit">Soumettre la réponse</button>
         </section>
 
-        <!-- ÉCRAN 4 : SYNCHRONISATION & SCORE -->
         <section id="reportScreen" class="card hidden" style="text-align: center; max-width: 550px; margin: 2rem auto;">
             <h2 style="color:var(--success); font-size:1.8rem; margin-bottom:0.5rem;" data-i18n="eval_ended">📝 Évaluation Terminée</h2>
             <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:2rem;" data-i18n="eval_saved">Données sauvegardées de manière bidirectionnelle.</p>
@@ -634,9 +676,18 @@
 
     </main>
 
-    <!-- Pied de Page Exigé avec Slogans Dynamiques -->
     <footer>
-        <img src="arie transparent.png" alt="Holcim Footer Logo" class="footer-logo">
+        <div class="footer-logo-container">
+            <svg class="logo-svg" viewBox="0 0 450 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <use href="#gradient-blue" />
+                <use href="#gradient-green" />
+                <g transform="translate(10, 10)">
+                    <path d="M 50,20 A 30,30 0 0,1 80,50 L 80,65 L 60,65 L 60,50 A 10,10 0 0,0 50,40 A 10,10 0 0,0 40,50 L 40,65 L 20,65 L 20,50 A 30,30 0 0,1 50,20 Z" fill="url(#gradient-blue)" />
+                    <path d="M 50,80 A 30,30 0 0,1 20,50 L 20,35 L 40,35 L 40,50 A 10,10 0 0,0 50,60 A 10,10 0 0,0 60,50 L 60,35 L 80,35 L 80,50 A 30,30 0 0,1 50,80 Z" fill="url(#gradient-green)" />
+                </g>
+                <text x="120" y="85" font-family="'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="78px" fill="#ffffff">HOLCIM</text>
+            </svg>
+        </div>
         <div class="footer-slogan" data-i18n="footer_slogan">CIAP PRO – Évaluer, Améliorer, Performer</div>
         <div class="footer-sub" data-i18n="footer_sub">La compétence d'aujourd'hui, la performance de demain.</div>
     </footer>
@@ -653,7 +704,7 @@
         let timerQ, secQ, secG, timerG;
         let chartD, chartS;
 
-        // --- DICTIONNAIRE MULTILINGUE ENRICHI ---
+        // --- TRADUCTIONS ---
         const translations = {
             fr: {
                 main_title: "TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO",
@@ -747,7 +798,7 @@
             applyLanguage(e.target.value);
         });
 
-        // --- GESTION DU THÈME ---
+        // --- THEME ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -759,7 +810,7 @@
             }
         });
 
-        // --- GESTION ADMINISTRATIVE ---
+        // --- CONSOLE ADMINISTRATION ---
         document.getElementById('adminLoginBtn').addEventListener('click', () => {
             document.getElementById('adminAuthScreen').classList.toggle('hidden');
         });
@@ -774,8 +825,9 @@
                 document.getElementById('dashboardScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
                 document.getElementById('adminPin').value = "";
+                showTab('results'); // Défaut onglet historique
             } else {
-                alert("Code d'accès incorrect.");
+                alert("Code PIN incorrect.");
             }
         });
 
@@ -784,22 +836,30 @@
             document.getElementById('dashboardScreen').classList.remove('hidden');
         });
 
-        // Gestion d'onglets de la console
-        document.getElementById('tabResultsBtn').addEventListener('click', () => {
-            document.getElementById('adminTableResults').classList.remove('hidden');
-            document.getElementById('adminTableQuestions').classList.add('hidden');
-            document.getElementById('tabResultsBtn').style.borderBottom = "3px solid var(--holcim-blue-light)";
-            document.getElementById('tabQuestionsBtn').style.borderBottom = "none";
-        });
+        // --- GESTION DES ONGLETS ADMIN ---
+        function showTab(tabName) {
+            const tabResults = document.getElementById('adminTableResults');
+            const tabQuestions = document.getElementById('adminTableQuestions');
+            const btnResults = document.getElementById('tabResultsBtn');
+            const btnQuestions = document.getElementById('tabQuestionsBtn');
 
-        document.getElementById('tabQuestionsBtn').addEventListener('click', () => {
-            document.getElementById('adminTableQuestions').classList.remove('hidden');
-            document.getElementById('adminTableResults').classList.add('hidden');
-            document.getElementById('tabQuestionsBtn').style.borderBottom = "3px solid var(--holcim-blue-light)";
-            document.getElementById('tabResultsBtn').style.borderBottom = "none";
-        });
+            if (tabName === 'results') {
+                tabResults.classList.remove('hidden');
+                tabQuestions.classList.add('hidden');
+                btnResults.classList.add('active');
+                btnQuestions.classList.remove('active');
+            } else {
+                tabQuestions.classList.remove('hidden');
+                tabResults.classList.add('hidden');
+                btnQuestions.classList.add('active');
+                btnResults.classList.remove('active');
+            }
+        }
 
-        // --- CHARGEMENT INITIAL ---
+        document.getElementById('tabResultsBtn').addEventListener('click', () => showTab('results'));
+        document.getElementById('tabQuestionsBtn').addEventListener('click', () => showTab('questions'));
+
+        // --- CHARGEMENT INITIAL PORTAIL ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             userNameFormatted = document.getElementById('firstName').value.trim() + " " + document.getElementById('lastName').value.trim().toUpperCase();
@@ -812,7 +872,7 @@
             await refreshDataFromServer();
         });
 
-        // --- MÉTHODE DE SYNCHRONISATION BIDIRECTIONNELLE ACTIVE (NO IFRAME) ---
+        // --- SYNCHRONISATION GET (LECTURE) ---
         async function refreshDataFromServer() {
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
@@ -836,7 +896,7 @@
             }
         }
 
-        // --- CONSERVATION ET RENDU ANALYTIQUE ---
+        // --- KPI ET GRAPHICS ---
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
@@ -923,33 +983,37 @@
             });
         }
 
-        // --- ACTIONS DIRECTES DE SYNCHRONISATION CLOUD ---
-        
+        // --- ACTIONS POST (SYNCHRONISATION CLOUD INTÉGRALE) ---
         async function syncWithServer(payload) {
             document.getElementById('adminDashboardScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
-                await fetch(API, {
+                const response = await fetch(API, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
+                const result = await response.json();
+                
+                // On recharge instantanément l'application avec les nouvelles données du serveur
                 await refreshDataFromServer();
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
             } catch(e) {
-                alert("Erreur de sauvegarde sur le serveur.");
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('adminDashboardScreen').classList.remove('hidden');
+                alert("Erreur lors de la synchronisation avec Sheets. Veuillez réessayer.");
                 console.error(e);
             }
         }
 
-        // Supprimer une question du serveur
+        // Action de suppression question
         window.deleteQuestion = async function(idx) {
-            if(confirm("Supprimer cette question du serveur Google Sheets ?")) {
+            if(confirm("Confirmer la suppression de cette question sur Google Sheets ?")) {
                 await syncWithServer({ action: "deleteQuestion", index: idx });
             }
         };
 
-        // Ouvrir modification de question
+        // Remplissage automatique pour modification
         window.editQuestion = function(idx) {
             const q = serverQuestions[idx];
             document.getElementById('formQuestionTitle').innerText = "Modifier la Question N°" + (idx + 1);
@@ -959,12 +1023,14 @@
             document.getElementById('formOptions').value = q.options.filter(Boolean).join(';');
             document.getElementById('formCorrect').value = q.correct;
             document.getElementById('formTemps').value = q.temps;
+            
             document.getElementById('questionFormContainer').classList.remove('hidden');
+            window.scrollTo({top: 150, behavior: 'smooth'});
         };
 
-        // Supprimer ligne historique
+        // Action de suppression résultat d'audit
         window.deleteHistoryRow = async function(idx) {
-            if(confirm("Supprimer ce résultat d'évaluation de la base ?")) {
+            if(confirm("Confirmer la suppression de ce résultat de la base ?")) {
                 await syncWithServer({ action: "deleteResult", index: idx });
             }
         };
@@ -984,7 +1050,7 @@
             document.getElementById('questionFormContainer').classList.add('hidden');
         });
 
-        // Enregistrer Question (Ajout/Modification synchronisé)
+        // Validation & Enregistrement
         document.getElementById('saveQuestionBtn').addEventListener('click', async () => {
             const idxStr = document.getElementById('editQuestionIdx').value;
             const payload = {
@@ -998,7 +1064,7 @@
             };
 
             if(!payload.domaine || !payload.question || payload.options.length < 2) {
-                alert("Veuillez remplir correctement les champs.");
+                alert("Saisie invalide (Assurez-vous de renseigner au moins 2 options séparées par des ';').");
                 return;
             }
 
@@ -1006,14 +1072,16 @@
             await syncWithServer(payload);
         });
 
+        // Construction dynamique des tables d'administration
         function buildAdminTables(history, questions) {
+            // Table des résultats
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
             history.forEach((r, idx) => {
                 const row = document.createElement('tr');
                 const isPass = r.verdict === "CONFORME" ? "badge-success" : "badge-danger";
                 row.innerHTML = `
-                    <td style="opacity:0.7;">${r.horodatage}</td>
+                    <td style="opacity:0.7;">${r.horodatage || '--'}</td>
                     <td style="font-weight:bold;">${r.audite}</td>
                     <td>${r.domaine}</td>
                     <td style="font-weight:bold; color:var(--holcim-blue-light);">${r.score}%</td>
@@ -1024,6 +1092,7 @@
                 tResult.appendChild(row);
             });
 
+            // Table des questions
             const tQuest = document.getElementById('adminQuestionsBody');
             tQuest.innerHTML = "";
             questions.forEach((q, idx) => {
@@ -1043,7 +1112,7 @@
             });
         }
 
-        // --- PROTOCOLE D'EXAMEN ACTIF ---
+        // --- EXAM PROTOCOL ---
         document.getElementById('btnStartExam').addEventListener('click', () => {
             const selectDom = document.getElementById('cfgDomaine').value;
             const sizeCfg = document.getElementById('cfgNb').value;
@@ -1054,7 +1123,7 @@
             const limit = sizeCfg === "all" ? pool.length : parseInt(sizeCfg);
             currentExam = pool.slice(0, limit);
 
-            if(currentExam.length === 0) { alert("Aucune question de disponible."); return; }
+            if(currentExam.length === 0) { alert("Aucune question de disponible pour ce domaine."); return; }
 
             indexQ = 0; answersUser = []; secG = 0;
             document.getElementById('dashboardScreen').classList.add('hidden');
@@ -1121,7 +1190,6 @@
             const statut = score >= 75 ? "CONFORME" : "À REFORMER";
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
-            // POST asynchrone direct pour enregistrement
             try {
                 await fetch(API, {
                     method: 'POST',
@@ -1137,7 +1205,7 @@
                 });
                 await refreshDataFromServer();
             } catch(e) {
-                console.error("Échec de l'envoi du rapport", e);
+                console.error("Échec d'enregistrement du rapport", e);
             }
 
             document.getElementById('loadingScreen').classList.add('hidden');
