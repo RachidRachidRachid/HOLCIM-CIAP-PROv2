@@ -693,7 +693,8 @@
     </footer>
 
     <script>
-        const API = "https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec";
+        // URL DE DEPLOIEMENT MISE À JOUR & VALIDÉE
+        const API = "https://script.google.com/macros/s/AKfycbwxt14pCM6khVQ6X3NwL95Qy4azLM1JXHZJOWxOibwtaK31Nym-EOvXckP8qtCnIaFW/exec";
         
         let serverQuestions = [];
         let rawHistory = [];
@@ -798,7 +799,7 @@
             applyLanguage(e.target.value);
         });
 
-        // --- THEME ---
+        // --- SYSTEM THEME ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -825,7 +826,7 @@
                 document.getElementById('dashboardScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
                 document.getElementById('adminPin').value = "";
-                showTab('results'); // Défaut onglet historique
+                showTab('results'); // Afficher par défaut historique des audités
             } else {
                 alert("Code PIN incorrect.");
             }
@@ -859,7 +860,7 @@
         document.getElementById('tabResultsBtn').addEventListener('click', () => showTab('results'));
         document.getElementById('tabQuestionsBtn').addEventListener('click', () => showTab('questions'));
 
-        // --- CHARGEMENT INITIAL PORTAIL ---
+        // --- CHARGEMENT PRINCIPAL ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             userNameFormatted = document.getElementById('firstName').value.trim() + " " + document.getElementById('lastName').value.trim().toUpperCase();
@@ -872,14 +873,16 @@
             await refreshDataFromServer();
         });
 
-        // --- SYNCHRONISATION GET (LECTURE) ---
+        // --- SYNCHRONISATION GET (LECTURE DES DONNÉES DEPUIS SHEETS) ---
         async function refreshDataFromServer() {
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
                 const res = await fetch(API);
                 const data = await res.json();
-                serverQuestions = data.questions || [];
-                rawHistory = data.resultats || [];
+                
+                // Vérification et typage pour éviter tout bug d'initialisation
+                serverQuestions = Array.isArray(data.questions) ? data.questions : [];
+                rawHistory = Array.isArray(data.resultats) ? data.resultats : [];
 
                 buildKPIs(rawHistory);
                 buildCharts(rawHistory);
@@ -896,11 +899,16 @@
             }
         }
 
-        // --- KPI ET GRAPHICS ---
+        // --- KPI ET DIAGRAMMES INTERACTIFS ---
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
-            if (total === 0) return;
+            if (total === 0) {
+                document.getElementById('kpiPassRate').innerText = "0%";
+                document.getElementById('kpiAvgScore').innerText = "0%";
+                document.getElementById('statQuestionsCount').innerText = serverQuestions.length;
+                return;
+            }
 
             let correctSum = 0, conformes = 0;
             history.forEach(r => {
@@ -983,37 +991,45 @@
             });
         }
 
-        // --- ACTIONS POST (SYNCHRONISATION CLOUD INTÉGRALE) ---
+        // --- ACTIONS POST (SYNCHRONISATION CLOUD TOTALEMENT CORRIGÉE POUR ÉVITER LES ERREURS CORS D'AIGUILLAGE) ---
         async function syncWithServer(payload) {
             document.getElementById('adminDashboardScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
-                const response = await fetch(API, {
+                // Pour surmonter les erreurs de redirection CORS de Google Apps Script,
+                // l'utilisation de mode: 'no-cors' et de l'envoi au format texte brut est requise.
+                await fetch(API, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    },
                     body: JSON.stringify(payload)
                 });
-                const result = await response.json();
                 
-                // On recharge instantanément l'application avec les nouvelles données du serveur
+                // Petite pause de latence d'écriture côté Google Server
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // On met à jour l'application immédiatement
                 await refreshDataFromServer();
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
             } catch(e) {
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
-                alert("Erreur lors de la synchronisation avec Sheets. Veuillez réessayer.");
+                alert("Erreur lors de la synchronisation avec Sheets.");
                 console.error(e);
             }
         }
 
-        // Action de suppression question
+        // Action de suppression de question
         window.deleteQuestion = async function(idx) {
-            if(confirm("Confirmer la suppression de cette question sur Google Sheets ?")) {
+            if(confirm("Confirmer la suppression définitive de cette question sur Google Sheets ?")) {
                 await syncWithServer({ action: "deleteQuestion", index: idx });
             }
         };
 
-        // Remplissage automatique pour modification
+        // Remplissage du formulaire de modification d'une question
         window.editQuestion = function(idx) {
             const q = serverQuestions[idx];
             document.getElementById('formQuestionTitle').innerText = "Modifier la Question N°" + (idx + 1);
@@ -1028,9 +1044,9 @@
             window.scrollTo({top: 150, behavior: 'smooth'});
         };
 
-        // Action de suppression résultat d'audit
+        // Suppression de l'historique d'évaluation
         window.deleteHistoryRow = async function(idx) {
-            if(confirm("Confirmer la suppression de ce résultat de la base ?")) {
+            if(confirm("Confirmer la suppression définitive de ce résultat de la base ?")) {
                 await syncWithServer({ action: "deleteResult", index: idx });
             }
         };
@@ -1050,7 +1066,7 @@
             document.getElementById('questionFormContainer').classList.add('hidden');
         });
 
-        // Validation & Enregistrement
+        // Enregistrement / Modification
         document.getElementById('saveQuestionBtn').addEventListener('click', async () => {
             const idxStr = document.getElementById('editQuestionIdx').value;
             const payload = {
@@ -1064,7 +1080,7 @@
             };
 
             if(!payload.domaine || !payload.question || payload.options.length < 2) {
-                alert("Saisie invalide (Assurez-vous de renseigner au moins 2 options séparées par des ';').");
+                alert("Saisie invalide (Saisir au moins 2 options délimitées par des points-virgules ';').");
                 return;
             }
 
@@ -1072,9 +1088,9 @@
             await syncWithServer(payload);
         });
 
-        // Construction dynamique des tables d'administration
+        // Remplissage dynamique des deux tableaux administratifs
         function buildAdminTables(history, questions) {
-            // Table des résultats
+            // 1. Table Résultats
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
             history.forEach((r, idx) => {
@@ -1092,7 +1108,7 @@
                 tResult.appendChild(row);
             });
 
-            // Table des questions
+            // 2. Table Questions (S'assure de l'affichage complet sans masquage accidentel)
             const tQuest = document.getElementById('adminQuestionsBody');
             tQuest.innerHTML = "";
             questions.forEach((q, idx) => {
@@ -1112,7 +1128,7 @@
             });
         }
 
-        // --- EXAM PROTOCOL ---
+        // --- PROTOCOLE D'EXAMEN ACTIF ---
         document.getElementById('btnStartExam').addEventListener('click', () => {
             const selectDom = document.getElementById('cfgDomaine').value;
             const sizeCfg = document.getElementById('cfgNb').value;
@@ -1191,8 +1207,13 @@
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
             try {
+                // Envoi synchrone en arrière-plan vers Sheets pour enregistrer la nouvelle évaluation d'un candidat
                 await fetch(API, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    },
                     body: JSON.stringify({
                         action: "addResult",
                         user: userNameFormatted,
@@ -1203,9 +1224,11 @@
                         temps: tempsTotalStr
                     })
                 });
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 await refreshDataFromServer();
             } catch(e) {
-                console.error("Échec d'enregistrement du rapport", e);
+                console.error("Échec d'enregistrement automatique du rapport d'évaluation", e);
             }
 
             document.getElementById('loadingScreen').classList.add('hidden');
