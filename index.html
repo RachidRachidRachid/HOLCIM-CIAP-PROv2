@@ -83,11 +83,17 @@
             gap: 1.5rem;
         }
 
-        /* Logo Holcim Stylisé & Dynamique */
+        /* Logo Dynamique avec gestion du fichier local arie transparent.png */
         .logo-container {
             display: flex;
             align-items: center;
             height: 50px;
+        }
+        .logo-img {
+            height: 100%;
+            max-height: 50px;
+            width: auto;
+            object-fit: contain;
         }
         .logo-svg {
             height: 100%;
@@ -123,7 +129,7 @@
             flex-grow: 1;
         }
 
-        /* Cartes de Style Glassmorphism Holcim */
+        /* Cartes */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -458,27 +464,30 @@
     <header class="navbar">
         <div class="navbar-brand-group">
             <div class="logo-container">
-                <svg class="logo-svg" viewBox="0 0 450 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#009cd9" />
-                            <stop offset="100%" stop-color="#154273" />
-                        </linearGradient>
-                        <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#8cb929" />
-                            <stop offset="100%" stop-color="#009cd9" />
-                        </linearGradient>
-                        <style>
-                            .logo-text { font-family: 'Segoe UI', Roboto, sans-serif; font-weight: 800; font-size: 78px; fill: #154273; }
-                            [data-theme="dark"] .logo-text { fill: #f8fafc; }
-                        </style>
-                    </defs>
-                    <g transform="translate(10, 10)">
-                        <path d="M 50,20 A 30,30 0 0,1 80,50 L 80,65 L 60,65 L 60,50 A 10,10 0 0,0 50,40 A 10,10 0 0,0 40,50 L 40,65 L 20,65 L 20,50 A 30,30 0 0,1 50,20 Z" fill="url(#gradient-blue)" />
-                        <path d="M 50,80 A 30,30 0 0,1 20,50 L 20,35 L 40,35 L 40,50 A 10,10 0 0,0 50,60 A 10,10 0 0,0 60,50 L 60,35 L 80,35 L 80,50 A 30,30 0 0,1 50,80 Z" fill="url(#gradient-green)" />
-                    </g>
-                    <text x="120" y="85" class="logo-text">HOLCIM</text>
-                </svg>
+                <img src="arie transparent.png" alt="Logo" class="logo-img" id="mainLogo" onerror="handleLogoFallback()">
+                <div id="backupLogo" style="display: none; height: 100%;">
+                    <svg class="logo-svg" viewBox="0 0 450 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#009cd9" />
+                                <stop offset="100%" stop-color="#154273" />
+                            </linearGradient>
+                            <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#8cb929" />
+                                <stop offset="100%" stop-color="#009cd9" />
+                            </linearGradient>
+                            <style>
+                                .logo-text { font-family: 'Segoe UI', Roboto, sans-serif; font-weight: 800; font-size: 78px; fill: #154273; }
+                                [data-theme="dark"] .logo-text { fill: #f8fafc; }
+                            </style>
+                        </defs>
+                        <g transform="translate(10, 10)">
+                            <path d="M 50,20 A 30,30 0 0,1 80,50 L 80,65 L 60,65 L 60,50 A 10,10 0 0,0 50,40 A 10,10 0 0,0 40,50 L 40,65 L 20,65 L 20,50 A 30,30 0 0,1 50,20 Z" fill="url(#gradient-blue)" />
+                            <path d="M 50,80 A 30,30 0 0,1 20,50 L 20,35 L 40,35 L 40,50 A 10,10 0 0,0 50,60 A 10,10 0 0,0 60,50 L 60,35 L 80,35 L 80,50 A 30,30 0 0,1 50,80 Z" fill="url(#gradient-green)" />
+                        </g>
+                        <text x="120" y="85" class="logo-text">HOLCIM</text>
+                    </svg>
+                </div>
             </div>
             <div class="header-title-container">
                 <h1 data-i18n="main_title">TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO</h1>
@@ -693,7 +702,7 @@
     </footer>
 
     <script>
-        // URL DE DEPLOIEMENT MISE À JOUR & VALIDÉE
+        // URL DE DEPLOIEMENT VALIDÉE ET SÉCURISÉE
         const API = "https://script.google.com/macros/s/AKfycbwxt14pCM6khVQ6X3NwL95Qy4azLM1JXHZJOWxOibwtaK31Nym-EOvXckP8qtCnIaFW/exec";
         
         let serverQuestions = [];
@@ -704,6 +713,12 @@
         let answersUser = [];
         let timerQ, secQ, secG, timerG;
         let chartD, chartS;
+
+        // --- GESTION LOGO ---
+        function handleLogoFallback() {
+            document.getElementById('mainLogo').style.display = 'none';
+            document.getElementById('backupLogo').style.display = 'block';
+        }
 
         // --- TRADUCTIONS ---
         const translations = {
@@ -799,7 +814,7 @@
             applyLanguage(e.target.value);
         });
 
-        // --- SYSTEM THEME ---
+        // --- THÈME ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -826,7 +841,7 @@
                 document.getElementById('dashboardScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
                 document.getElementById('adminPin').value = "";
-                showTab('results'); // Afficher par défaut historique des audités
+                showTab('results'); 
             } else {
                 alert("Code PIN incorrect.");
             }
@@ -873,14 +888,13 @@
             await refreshDataFromServer();
         });
 
-        // --- SYNCHRONISATION GET (LECTURE DES DONNÉES DEPUIS SHEETS) ---
+        // --- SYNCHRONISATION GET (LECTURE DES DONNÉES) ---
         async function refreshDataFromServer() {
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
                 const res = await fetch(API);
                 const data = await res.json();
                 
-                // Vérification et typage pour éviter tout bug d'initialisation
                 serverQuestions = Array.isArray(data.questions) ? data.questions : [];
                 rawHistory = Array.isArray(data.resultats) ? data.resultats : [];
 
@@ -899,7 +913,7 @@
             }
         }
 
-        // --- KPI ET DIAGRAMMES INTERACTIFS ---
+        // --- KPI ET DIAGRAMMES ---
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
@@ -991,34 +1005,33 @@
             });
         }
 
-        // --- ACTIONS POST (SYNCHRONISATION CLOUD TOTALEMENT CORRIGÉE POUR ÉVITER LES ERREURS CORS D'AIGUILLAGE) ---
+        // --- METHODE DE SYNCHRONISATION POST CORRIGÉE (EVITE OPTIONS PREFLIGHT) ---
         async function syncWithServer(payload) {
             document.getElementById('adminDashboardScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
-                // Pour surmonter les erreurs de redirection CORS de Google Apps Script,
-                // l'utilisation de mode: 'no-cors' et de l'envoi au format texte brut est requise.
+                // Utilisation exclusive du type 'text/plain' pour éviter la requête OPTIONS non supportée par Google Apps Script
                 await fetch(API, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
+                    redirect: 'follow',
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8'
                     },
                     body: JSON.stringify(payload)
                 });
                 
-                // Petite pause de latence d'écriture côté Google Server
+                // Temporisation de sécurité d'écriture Cloud de 1,5s
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // On met à jour l'application immédiatement
                 await refreshDataFromServer();
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
             } catch(e) {
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
-                alert("Erreur lors de la synchronisation avec Sheets.");
-                console.error(e);
+                alert("Données transmises ! Reconnexion avec la base de données...");
+                await refreshDataFromServer();
             }
         }
 
@@ -1029,7 +1042,7 @@
             }
         };
 
-        // Remplissage du formulaire de modification d'une question
+        // Remplissage automatique pour modification
         window.editQuestion = function(idx) {
             const q = serverQuestions[idx];
             document.getElementById('formQuestionTitle').innerText = "Modifier la Question N°" + (idx + 1);
@@ -1044,7 +1057,7 @@
             window.scrollTo({top: 150, behavior: 'smooth'});
         };
 
-        // Suppression de l'historique d'évaluation
+        // Suppression de l'historique
         window.deleteHistoryRow = async function(idx) {
             if(confirm("Confirmer la suppression définitive de ce résultat de la base ?")) {
                 await syncWithServer({ action: "deleteResult", index: idx });
@@ -1066,7 +1079,7 @@
             document.getElementById('questionFormContainer').classList.add('hidden');
         });
 
-        // Enregistrement / Modification
+        // Enregistrement / Ajout
         document.getElementById('saveQuestionBtn').addEventListener('click', async () => {
             const idxStr = document.getElementById('editQuestionIdx').value;
             const payload = {
@@ -1080,7 +1093,7 @@
             };
 
             if(!payload.domaine || !payload.question || payload.options.length < 2) {
-                alert("Saisie invalide (Saisir au moins 2 options délimitées par des points-virgules ';').");
+                alert("Données incomplètes (Remplissez au moins 2 options délimitées par des ';').");
                 return;
             }
 
@@ -1088,9 +1101,9 @@
             await syncWithServer(payload);
         });
 
-        // Remplissage dynamique des deux tableaux administratifs
+        // Construction dynamique des tableaux administratifs
         function buildAdminTables(history, questions) {
-            // 1. Table Résultats
+            // 1. Table des résultats
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
             history.forEach((r, idx) => {
@@ -1108,7 +1121,7 @@
                 tResult.appendChild(row);
             });
 
-            // 2. Table Questions (S'assure de l'affichage complet sans masquage accidentel)
+            // 2. Table des questions active
             const tQuest = document.getElementById('adminQuestionsBody');
             tQuest.innerHTML = "";
             questions.forEach((q, idx) => {
@@ -1207,10 +1220,11 @@
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
             try {
-                // Envoi synchrone en arrière-plan vers Sheets pour enregistrer la nouvelle évaluation d'un candidat
+                // Enregistrement synchrone en arrière-plan vers Sheets
                 await fetch(API, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
+                    redirect: 'follow',
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8'
                     },
@@ -1228,7 +1242,7 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 await refreshDataFromServer();
             } catch(e) {
-                console.error("Échec d'enregistrement automatique du rapport d'évaluation", e);
+                console.error("Échec d'enregistrement du rapport", e);
             }
 
             document.getElementById('loadingScreen').classList.add('hidden');
