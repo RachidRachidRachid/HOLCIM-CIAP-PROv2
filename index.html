@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" data-theme="dark" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIAP PRO v2 - Holcim Performance & Analytics</title>
+    <title>CIAP PRO v3 - Holcim Performance & Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -19,6 +19,19 @@
             --glass-glow: rgba(255, 94, 19, 0.15);
         }
 
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #ff5e13;
+            --accent-hover: #e04f0a;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass-glow: rgba(255, 94, 19, 0.08);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -28,12 +41,16 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-primary);
-            background-image: radial-gradient(circle at top right, rgba(255, 94, 19, 0.05), transparent 350px);
             color: var(--text-main);
-            /* Suppression des restrictions de hauteur pour libérer l'ascenseur */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Support de l'orientation Arabe (RTL) */
+        [dir="rtl"] {
+            text-align: right;
         }
 
         .navbar {
@@ -69,14 +86,13 @@
             flex-grow: 1;
         }
 
-        /* Glassmorphism stable sans blocage de scroll */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
             border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
             margin-bottom: 1.5rem;
             width: 100%;
         }
@@ -103,18 +119,23 @@
             color: var(--text-muted);
         }
 
-        select, input {
+        select, input, textarea {
             padding: 0.8rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            background: rgba(11, 15, 25, 0.8);
-            color: white;
+            background: rgba(11, 15, 25, 0.05);
+            color: var(--text-main);
             font-size: 0.95rem;
             transition: all 0.3s;
             width: 100%;
         }
 
-        select:focus, input:focus {
+        [data-theme="dark"] select, [data-theme="dark"] input, [data-theme="dark"] textarea {
+            background: rgba(11, 15, 25, 0.8);
+            color: white;
+        }
+
+        select:focus, input:focus, textarea:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 10px var(--glass-glow);
@@ -154,7 +175,27 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Onglets d'administration */
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-edit {
+            background: #38bdf8;
+            color: black;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
         .tab-nav {
             display: flex;
             gap: 0.5rem;
@@ -179,7 +220,6 @@
             border-bottom: 2px solid var(--accent);
         }
 
-        /* Grid KPIs */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -196,7 +236,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, rgba(20, 30, 54, 0.8), rgba(11, 15, 25, 0.8));
+            background: var(--bg-card);
             padding: 1.2rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -218,13 +258,6 @@
             color: var(--accent);
         }
 
-        @media (min-width: 768px) {
-            .stat-card { padding: 1.8rem; }
-            .stat-card h3 { font-size: 0.75rem; }
-            .stat-card p { font-size: 2.2rem; }
-        }
-
-        /* Graphiques */
         .charts-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -241,7 +274,7 @@
         }
 
         .chart-wrapper {
-            background: rgba(11, 15, 25, 0.5);
+            background: rgba(11, 15, 25, 0.03);
             padding: 1.2rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -249,28 +282,21 @@
             position: relative;
         }
 
-        .setup-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        [data-theme="dark"] .chart-wrapper {
+            background: rgba(11, 15, 25, 0.5);
         }
 
-        @media (min-width: 768px) {
-            .setup-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        /* Tableaux */
         .table-responsive {
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            background: rgba(11, 15, 25, 0.4);
+            background: rgba(11, 15, 25, 0.02);
             margin-top: 1rem;
             -webkit-overflow-scrolling: touch;
+        }
+
+        [data-theme="dark"] .table-responsive {
+            background: rgba(11, 15, 25, 0.4);
         }
 
         table {
@@ -278,7 +304,11 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 0.85rem;
-            min-width: 600px;
+            min-width: 700px;
+        }
+
+        [dir="rtl"] table {
+            text-align: right;
         }
 
         th {
@@ -286,7 +316,7 @@
             padding: 0.8rem;
             font-weight: 600;
             border-bottom: 2px solid var(--border-color);
-            color: var(--text-muted);
+            color: #fff;
         }
 
         td {
@@ -305,18 +335,6 @@
         .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
         .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-        #examScreen {
-            max-width: 650px;
-            margin: 1rem auto;
-        }
-
-        .exam-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
         .options-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -325,7 +343,7 @@
         }
 
         .option-btn {
-            background: rgba(11, 15, 25, 0.7);
+            background: rgba(11, 15, 25, 0.05);
             border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
@@ -335,6 +353,14 @@
             transition: all 0.2s;
             font-size: 0.95rem;
             width: 100%;
+        }
+
+        [dir="rtl"] .option-btn {
+            text-align: right;
+        }
+
+        [data-theme="dark"] .option-btn {
+            background: rgba(11, 15, 25, 0.7);
         }
 
         .option-btn:hover, .option-btn.selected {
@@ -374,93 +400,131 @@
 <body>
 
     <header class="navbar">
-        <div class="navbar-brand">🏭 HOLCIM <span style="color: var(--accent);">CIAP ANALYTICS</span></div>
+        <div class="navbar-brand">🏭 HOLCIM <span style="color: var(--accent);">CIAP PRO</span></div>
         <div class="navbar-actions">
+            <select id="langSelect" style="width: auto; padding: 0.4rem; font-size: 0.8rem; margin-right: 5px;">
+                <option value="fr">🇫🇷 Français</option>
+                <option value="ar">🇩🇿 العربية</option>
+            </select>
+            <button id="themeToggleBtn" class="btn-secondary" style="padding: 0.4rem 0.7rem;">☀️/🌙</button>
+            <button id="newCandidateBtn" class="btn-secondary" style="display: none;">🔄 <span data-i18n="new_session">Nouveau Candidat</span></button>
             <button id="adminLoginBtn" class="btn-secondary">⚙️ Admin</button>
-            <div id="userProfile" style="font-size: 0.8rem; display: none;"></div>
+            <div id="userProfile" style="font-size: 0.8rem; display: none; font-weight: bold; margin-left: 5px;"></div>
         </div>
     </header>
 
     <main class="container">
         
         <section id="loginScreen" class="card">
-            <h2 style="margin-top:0; font-weight: 800; font-size:1.5rem; margin-bottom:0.5rem;">Espace d'Évaluation CIAP</h2>
-            <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
+            <h2 data-i18n="login_title" style="margin-top:0; font-weight: 800; font-size:1.5rem; margin-bottom:0.5rem;">Espace d'Évaluation CIAP</h2>
+            <p data-i18n="login_sub" style="color: var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Nom de l'audité</label>
+                    <label data-i18n="label_lastname">Nom de l'audité</label>
                     <input type="text" id="lastName" required placeholder="Ex: BENALI" style="text-transform: uppercase;">
                 </div>
                 <div class="form-group">
-                    <label>Prénom</label>
+                    <label data-i18n="label_firstname">Prénom</label>
                     <input type="text" id="firstName" required placeholder="Ex: Mohamed">
                 </div>
-                <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Charger l'application</button>
+                <button type="submit" class="btn-primary" style="margin-top: 0.5rem;" data-i18n="btn_login">Charger l'application</button>
             </form>
         </section>
 
         <section id="adminAuthScreen" class="card hidden">
-            <h3 style="margin-bottom:1rem;">🔐 Accès Administration</h3>
+            <h3 data-i18n="admin_auth_title" style="margin-bottom:1rem;">🔐 Accès Administration</h3>
             <div class="form-group">
-                <label>Code PIN d'administration</label>
-                <input type="password" id="adminPin" placeholder="Entrez le code...">
+                <label data-i18n="label_pin">Code PIN d'administration</label>
+                <input type="password" id="adminPin" placeholder="••••">
             </div>
             <div style="display:flex; gap:0.8rem;">
-                <button id="verifyAdminBtn" class="btn-primary" style="flex:1;">Valider</button>
-                <button id="closeAdminAuthBtn" class="btn-secondary" style="flex:1;">Annuler</button>
+                <button id="verifyAdminBtn" class="btn-primary" style="flex:1;" data-i18n="btn_validate">Valider</button>
+                <button id="closeAdminAuthBtn" class="btn-secondary" style="flex:1;" data-i18n="btn_cancel">Annuler</button>
             </div>
         </section>
 
         <section id="loadingScreen" class="card hidden" style="text-align: center;">
             <div class="loading-spinner"></div>
-            <h3 style="font-size:1.1rem; margin-top:1rem;">Synchronisation sécurisée...</h3>
-            <p style="color:var(--text-muted); font-size:0.85rem;">Chargement en temps réel des données d'évaluation.</p>
+            <h3 data-i18n="loading_title" style="font-size:1.1rem; margin-top:1rem;">Synchronisation sécurisée...</h3>
+            <p data-i18n="loading_sub" style="color:var(--text-muted); font-size:0.85rem;">Chargement en temps réel des données d'évaluation.</p>
         </section>
 
         <section id="dashboardScreen" class="hidden">
             <div class="dashboard-grid">
-                <div class="stat-card"><h3>Audits</h3><p id="kpiTotal">0</p></div>
-                <div class="stat-card"><h3>Conformité</h3><p id="kpiPassRate" style="color: var(--success);">0%</p></div>
-                <div class="stat-card"><h3>Moyenne</h3><p id="kpiAvgScore">0%</p></div>
-                <div class="stat-card"><h3>Questions</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
+                <div class="stat-card"><h3 data-i18n="kpi_audits">Audits</h3><p id="kpiTotal">0</p></div>
+                <div class="stat-card"><h3 data-i18n="kpi_compliance">Conformité</h3><p id="kpiPassRate" style="color: var(--success);">0%</p></div>
+                <div class="stat-card"><h3 data-i18n="kpi_average">Moyenne</h3><p id="kpiAvgScore">0%</p></div>
+                <div class="stat-card"><h3 data-i18n="kpi_questions">Questions</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
             </div>
 
             <div class="charts-container">
                 <div class="chart-wrapper">
-                    <h4 style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Conformité par Secteur</h4>
+                    <h4 data-i18n="chart_domain" style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Conformité par Secteur</h4>
                     <canvas id="domaineChart"></canvas>
                 </div>
                 <div class="chart-wrapper">
-                    <h4 style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Répartition des Décisions</h4>
+                    <h4 data-i18n="chart_status" style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Répartition des Décisions</h4>
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
 
             <div class="card">
-                <h3 style="margin-top:0; font-size:1.2rem; margin-bottom:1rem;">🛠️ Initialisation du Test</h3>
+                <h3 data-i18n="setup_title" style="margin-top:0; font-size:1.2rem; margin-bottom:1rem;">🛠️ Initialisation du Test</h3>
                 <div class="setup-grid">
                     <div class="form-group">
-                        <label>Périmètre d'audit</label>
+                        <label data-i18n="label_scope">Périmètre d'audit</label>
                         <select id="cfgDomaine"></select>
                     </div>
                     <div class="form-group">
-                        <label>Nombre de questions</label>
+                        <label data-i18n="label_qty">Nombre de questions</label>
                         <select id="cfgNb">
-                            <option value="5" selected>5 Questions</option>
-                            <option value="10">10 Questions</option>
-                            <option value="20">20 Questions</option>
-                            <option value="all">Évaluation exhaustive</option>
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="all" data-i18n="opt_all">Évaluation exhaustive</option>
                         </select>
                     </div>
                 </div>
-                <button id="btnStartExam" class="btn-primary">Démarrer le protocole de test</button>
+                <button id="btnStartExam" class="btn-primary" data-i18n="btn_start">Démarrer le protocole de test</button>
             </div>
         </section>
 
         <section id="adminDashboardScreen" class="card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
-                <h2 style="margin:0; font-size:1.2rem;">⚙️ Console d'Administration</h2>
-                <button id="exitAdminBtn" class="btn-secondary">Quitter</button>
+                <h2 data-i18n="admin_title" style="margin:0; font-size:1.2rem;">⚙️ Console d'Administration</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button id="addQuestionBtn" class="btn-primary" style="padding: 0.5rem 1rem; font-size:0.85rem; width:auto;">➕ Ajouter Question</button>
+                    <button id="exitAdminBtn" class="btn-secondary" data-i18n="btn_exit">Quitter</button>
+                </div>
+            </div>
+
+            <div id="questionFormContainer" class="card hidden" style="background: rgba(0,0,0,0.1); border-color: var(--accent); margin-bottom: 2rem;">
+                <h3 id="formQuestionTitle">Ajouter une Nouvelle Question</h3>
+                <input type="hidden" id="editQuestionIdx" value="">
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Domaine</label>
+                    <input type="text" id="formDomaine" placeholder="Ex: CIMENT / SECURITE">
+                </div>
+                <div class="form-group">
+                    <label>Intitulé de la Question</label>
+                    <textarea id="formText" rows="3" placeholder="Écrire la question ici..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Options (séparées par des points-virgules ';')</label>
+                    <input type="text" id="formOptions" placeholder="Option A; Option B; Option C">
+                </div>
+                <div class="form-group">
+                    <label>Index de la bonne réponse (0 pour la 1ère option, 1 pour la 2ème...)</label>
+                    <input type="number" id="formCorrect" min="0" max="4" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Temps imparti (en secondes)</label>
+                    <input type="number" id="formTemps" min="5" value="30">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="saveQuestionBtn" class="btn-primary" style="flex:1;">Enregistrer</button>
+                    <button id="cancelQuestionFormBtn" class="btn-secondary" style="flex:1;">Annuler</button>
+                </div>
             </div>
 
             <div class="tab-nav">
@@ -478,6 +542,7 @@
                             <th>Score Réalisé</th>
                             <th>Verdict</th>
                             <th>Durée</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adminResultsBody"></tbody>
@@ -493,6 +558,7 @@
                             <th>Options Possibles</th>
                             <th>Index Réponse</th>
                             <th>Temps Limite</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adminQuestionsBody"></tbody>
@@ -510,17 +576,17 @@
                 <h3 id="questionText" style="line-height:1.4; font-size:1.15rem; margin:1rem 0;">--</h3>
                 <div id="optionsContainer" class="options-grid"></div>
             </div>
-            <button id="btnNext" class="btn-primary" style="margin-top:2rem;">Soumettre la réponse</button>
+            <button id="btnNext" class="btn-primary" style="margin-top:2rem;" data-i18n="btn_submit">Soumettre la réponse</button>
         </section>
 
         <section id="reportScreen" class="card hidden" style="text-align: center; max-width: 500px; margin: 2rem auto;">
-            <h2 style="color:var(--success); font-size:1.5rem; margin-bottom:0.5rem;">📝 Évaluation Terminée</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Données enregistrées avec succès.</p>
+            <h2 style="color:var(--success); font-size:1.5rem; margin-bottom:0.5rem;" data-i18n="eval_ended">📝 Évaluation Terminée</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;" data-i18n="eval_saved">Données enregistrées avec succès.</p>
             <div class="dashboard-grid">
-                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3>Score Certifié</h3><p id="repScore">--%</p></div>
-                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3>Verdict</h3><p id="repStatus">--</p></div>
+                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3 data-i18n="score_cert">Score Certifié</h3><p id="repScore">--%</p></div>
+                <div class="stat-card" style="background:rgba(255,255,255,0.02)"><h3 data-i18n="verdict">Verdict</h3><p id="repStatus">--</p></div>
             </div>
-            <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1rem; padding: 0.8rem;">Retourner à la console</button>
+            <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1rem; padding: 0.8rem;" data-i18n="btn_return">Retourner à la console</button>
         </section>
 
         <iframe name="syncFrame" id="syncFrame" class="hidden" style="display:none;"></iframe>
@@ -544,9 +610,111 @@
         let indexQ = 0;
         let answersUser = [];
         let timerQ, secQ, secG, timerG;
-        
         let chartD, chartS;
 
+        // --- DICTIONNAIRE MULTILINGUE (FR / AR) ---
+        const translations = {
+            fr: {
+                new_session: "Nouveau Candidat",
+                login_title: "Espace d'Évaluation CIAP",
+                login_sub: "Portail d'audit technique et suivi de conformité opérationnelle.",
+                label_lastname: "Nom de l'audité",
+                label_firstname: "Prénom",
+                btn_login: "Charger l'application",
+                admin_auth_title: "🔐 Accès Administration",
+                label_pin: "Code PIN d'administration",
+                btn_validate: "Valider",
+                btn_cancel: "Annuler",
+                loading_title: "Synchronisation sécurisée...",
+                loading_sub: "Chargement en temps réel des données d'évaluation.",
+                kpi_audits: "Audits",
+                kpi_compliance: "Conformité",
+                kpi_average: "Moyenne",
+                kpi_questions: "Questions",
+                chart_domain: "Conformité par Secteur",
+                chart_status: "Répartition des Décisions",
+                setup_title: "🛠️ Initialisation du Test",
+                label_scope: "Périmètre d'audit",
+                label_qty: "Nombre de questions",
+                opt_all: "Évaluation exhaustive",
+                btn_start: "Démarrer le protocole de test",
+                admin_title: "⚙️ Console d'Administration",
+                btn_exit: "Quitter",
+                btn_submit: "Soumettre la réponse",
+                eval_ended: "📝 Évaluation Terminée",
+                eval_saved: "Données enregistrées avec succès.",
+                score_cert: "Score Certifié",
+                verdict: "Verdict",
+                btn_return: "Retourner à la console"
+            },
+            ar: {
+                new_session: "مرشح جديد",
+                login_title: "فضاء تقييم CIAP",
+                login_sub: "بوابة التدقيق الفني ومتابعة المطابقة التشغيلية.",
+                label_lastname: "لقب الخاضع للتدقيق",
+                label_firstname: "الاسم الشخصي",
+                btn_login: "تحميل التطبيق",
+                admin_auth_title: "🔐 دخول الإدارة",
+                label_pin: "الرمز السري للإدارة",
+                btn_validate: "تأكيد",
+                btn_cancel: "إلغاء",
+                loading_title: "مزامنة آمنة جارية...",
+                loading_sub: "تحميل بيانات التقييم مباشرة في الوقت الفعلي.",
+                kpi_audits: "عمليات التدقيق",
+                kpi_compliance: "المطابقة",
+                kpi_average: "المعدل العام",
+                kpi_questions: "الأسئلة",
+                chart_domain: "المطابقة حسب القطاع",
+                chart_status: "توزيع القرارات",
+                setup_title: "🛠️ تهيئة الاختبار",
+                label_scope: "مجال التدقيق",
+                label_qty: "عدد الأسئلة",
+                opt_all: "تقييم شامل",
+                btn_start: "بدء اختبار البروتوكول",
+                admin_title: "⚙️ لوحة التحكم الإدارية",
+                btn_exit: "خروج",
+                btn_submit: "إرسال الإجابة",
+                eval_ended: "📝 انتهى التقييم",
+                eval_saved: "تم تسجيل البيانات بنجاح.",
+                score_cert: "النتيجة المعتمدة",
+                verdict: "القرار النهائي",
+                btn_return: "العودة إلى اللوحة الرئيسية"
+            }
+        };
+
+        // Fonction de basculement de langue
+        function applyLanguage(lang) {
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+        }
+
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            applyLanguage(e.target.value);
+        });
+
+        // --- GESTION DU THEME SOMBRE / CLAIR ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+        });
+
+        // --- GESTION CANDIDAT UNIQUE / NOUVEAU CANDIDAT ---
+        document.getElementById('newCandidateBtn').addEventListener('click', () => {
+            if(confirm("Voulez-vous déconnecter le profil actuel et enregistrer un nouveau candidat ?")) {
+                location.reload();
+            }
+        });
+
+        // --- DIALOGUES ET ADMINISTRATION ---
         document.getElementById('adminLoginBtn').addEventListener('click', () => {
             document.getElementById('adminAuthScreen').classList.toggle('hidden');
         });
@@ -586,6 +754,7 @@
             document.getElementById('adminTableResults').classList.add('hidden');
         });
 
+        // --- CHARGEMENT INITIAL (CONNEXION AUDITÉ) ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nom = document.getElementById('lastName').value.trim().toUpperCase();
@@ -595,6 +764,7 @@
             const profileDiv = document.getElementById('userProfile');
             profileDiv.innerText = "👤 " + userNameFormatted;
             profileDiv.style.display = "block";
+            document.getElementById('newCandidateBtn').style.display = "block";
 
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
@@ -621,6 +791,7 @@
             }
         });
 
+        // --- CONSTITUTION DU PORTAIL ANALYTICS ---
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
@@ -700,7 +871,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#fff', boxWidth: 12 } } }
+                    plugins: { legend: { position: 'bottom', labels: { color: '#888', boxWidth: 12 } } }
                 }
             });
         }
@@ -719,10 +890,99 @@
             });
         }
 
+        // --- ACTIONS D'ADMINISTRATION : MODIFIER & SUPPRIMER ---
+        
+        // Supprimer une question
+        window.deleteQuestion = function(idx) {
+            if(confirm("Êtes-vous sûr de vouloir supprimer cette question définitivement ?")) {
+                serverQuestions.splice(idx, 1);
+                buildAdminTables(rawHistory, serverQuestions);
+                buildSelectors();
+            }
+        };
+
+        // Ouvrir formulaire modification question
+        window.editQuestion = function(idx) {
+            const q = serverQuestions[idx];
+            document.getElementById('formQuestionTitle').innerText = "Modifier la Question N°" + (idx + 1);
+            document.getElementById('editQuestionIdx').value = idx;
+            document.getElementById('formDomaine').value = q.domaine;
+            document.getElementById('formText').value = q.question;
+            document.getElementById('formOptions').value = q.options.filter(Boolean).join(';');
+            document.getElementById('formCorrect').value = q.correct;
+            document.getElementById('formTemps').value = q.temps;
+            document.getElementById('questionFormContainer').classList.remove('hidden');
+        };
+
+        // Supprimer un historique d'audité
+        window.deleteHistoryRow = function(idx) {
+            if(confirm("Supprimer cette entrée d'historique ?")) {
+                rawHistory.splice(idx, 1);
+                buildKPIs(rawHistory);
+                buildCharts(rawHistory);
+                buildAdminTables(rawHistory, serverQuestions);
+            }
+        };
+
+        // Afficher formulaire ajout question
+        document.getElementById('addQuestionBtn').addEventListener('click', () => {
+            document.getElementById('formQuestionTitle').innerText = "Ajouter une Nouvelle Question";
+            document.getElementById('editQuestionIdx').value = "";
+            document.getElementById('formDomaine').value = "";
+            document.getElementById('formText').value = "";
+            document.getElementById('formOptions').value = "";
+            document.getElementById('formCorrect').value = "0";
+            document.getElementById('formTemps').value = "30";
+            document.getElementById('questionFormContainer').classList.remove('hidden');
+        });
+
+        // Annuler formulaire question
+        document.getElementById('cancelQuestionFormBtn').addEventListener('click', () => {
+            document.getElementById('questionFormContainer').classList.add('hidden');
+        });
+
+        // Sauvegarder question (Ajout ou Edition)
+        document.getElementById('saveQuestionBtn').addEventListener('click', () => {
+            const idxStr = document.getElementById('editQuestionIdx').value;
+            const dom = document.getElementById('formDomaine').value.trim();
+            const text = document.getElementById('formText').value.trim();
+            const optsStr = document.getElementById('formOptions').value.trim();
+            const correct = parseInt(document.getElementById('formCorrect').value);
+            const temps = parseInt(document.getElementById('formTemps').value);
+
+            if(!dom || !text || !optsStr) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const optionsArr = optsStr.split(';').map(o => o.trim());
+
+            const newQ = {
+                domaine: dom,
+                question: text,
+                options: optionsArr,
+                correct: correct,
+                temps: temps
+            };
+
+            if(idxStr === "") {
+                // Ajout
+                serverQuestions.push(newQ);
+            } else {
+                // Modification
+                serverQuestions[parseInt(idxStr)] = newQ;
+            }
+
+            document.getElementById('questionFormContainer').classList.add('hidden');
+            buildAdminTables(rawHistory, serverQuestions);
+            buildSelectors();
+        });
+
+        // Construction dynamique des tableaux
         function buildAdminTables(history, questions) {
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
-            [...history].reverse().forEach(r => {
+            history.forEach((r, idx) => {
                 const row = document.createElement('tr');
                 const isPass = r.verdict === "CONFORME" ? "badge-success" : "badge-danger";
                 row.innerHTML = `
@@ -732,6 +992,9 @@
                     <td style="font-weight:bold; color:var(--accent);">${r.score}%</td>
                     <td><span class="badge ${isPass}">${r.verdict}</span></td>
                     <td style="opacity:0.8;">${r.temps}</td>
+                    <td>
+                        <button class="btn-danger" onclick="deleteHistoryRow(${idx})">🗑️</button>
+                    </td>
                 `;
                 tResult.appendChild(row);
             });
@@ -746,11 +1009,16 @@
                     <td style="font-size:0.8rem; color:var(--text-muted);">${q.options.filter(Boolean).join(' | ')}</td>
                     <td style="text-align:center; font-weight:bold;">Index ${q.correct}</td>
                     <td style="opacity:0.8; text-align:center;">${q.temps}s</td>
+                    <td>
+                        <button class="btn-edit" onclick="editQuestion(${idx})">✏️</button>
+                        <button class="btn-danger" onclick="deleteQuestion(${idx})">🗑️</button>
+                    </td>
                 `;
                 tQuest.appendChild(row);
             });
         }
 
+        // --- CODE DÉROULEMENT DU TEST ACTIF ---
         document.getElementById('btnStartExam').addEventListener('click', () => {
             const selectDom = document.getElementById('cfgDomaine').value;
             const sizeCfg = document.getElementById('cfgNb').value;
@@ -830,7 +1098,7 @@
             const statut = score >= 75 ? "CONFORME" : "À REFORMER";
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
-            // Remplissage précis des variables du formulaire
+            // Remplissage des variables du formulaire de synchronisation
             document.getElementById('postUser').value = userNameFormatted;
             document.getElementById('postDomaine').value = document.getElementById('cfgDomaine').value;
             document.getElementById('postNb').value = currentExam.length;
@@ -838,10 +1106,10 @@
             document.getElementById('postStatut').value = statut;
             document.getElementById('postTemps').value = tempsTotalStr;
 
-            // Envoi synchrone vers le Sheets
+            // Envoi vers le Sheets
             document.getElementById('googleSyncForm').submit();
 
-            // Enregistrement local dynamique
+            // Enregistrement dans l'historique local actif
             const now = new Date();
             const dynamicDateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
