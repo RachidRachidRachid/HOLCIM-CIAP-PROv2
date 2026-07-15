@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO</title>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -83,7 +84,6 @@
             gap: 1.5rem;
         }
 
-        /* Logo Dynamique avec gestion du fichier local arie transparent.png */
         .logo-container {
             display: flex;
             align-items: center;
@@ -508,6 +508,7 @@
 
     <main class="container">
         
+        <!-- ÉCRAN 1 : CONNEXION SÉCURISÉE -->
         <section id="loginScreen" class="card">
             <h2 data-i18n="login_title" style="font-size: 1.8rem; font-weight: 850; margin-bottom: 0.5rem;">Espace d'Évaluation CIAP</h2>
             <p data-i18n="login_sub" style="color: var(--text-muted); margin-bottom: 2rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
@@ -524,6 +525,7 @@
             </form>
         </section>
 
+        <!-- PORTAL ADMIN : PIN CODE -->
         <section id="adminAuthScreen" class="card hidden">
             <h3 data-i18n="admin_auth_title" style="margin-bottom:1.5rem;">🔐 Accès Administration</h3>
             <div class="form-group">
@@ -536,12 +538,14 @@
             </div>
         </section>
 
+        <!-- CHARGEMENT -->
         <section id="loadingScreen" class="card hidden" style="text-align: center;">
             <div class="loading-spinner"></div>
             <h3 data-i18n="loading_title" style="font-size:1.2rem; margin-top:1rem;">Synchronisation bidirectionnelle sécurisée...</h3>
             <p data-i18n="loading_sub" style="color:var(--text-muted); font-size:0.9rem;">Mise à jour en temps réel avec le serveur Google Sheets.</p>
         </section>
 
+        <!-- ÉCRAN 2 : PORTAIL PRINCIPAL (DASHBOARD ANALYTICS ET KPI) -->
         <section id="dashboardScreen" class="hidden">
             <div class="dashboard-grid">
                 <div class="stat-card"><h3 data-i18n="kpi_audits">Audits</h3><p id="kpiTotal">0</p></div>
@@ -550,6 +554,7 @@
                 <div class="stat-card"><h3 data-i18n="kpi_questions">Questions</h3><p id="statQuestionsCount" style="color: var(--holcim-blue-light);">0</p></div>
             </div>
 
+            <!-- Graphiques Interactifs -->
             <div class="charts-container">
                 <div class="chart-wrapper">
                     <h4 data-i18n="chart_domain" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px; text-transform:uppercase; font-weight: 800;">Conformité par Secteur</h4>
@@ -561,6 +566,7 @@
                 </div>
             </div>
 
+            <!-- Configuration de Session -->
             <div class="card">
                 <h3 data-i18n="setup_title" style="margin-top:0; font-size:1.3rem; margin-bottom:1.5rem;">🛠️ Initialisation du Test</h3>
                 <div class="setup-grid" style="display: grid; grid-template-columns: 1fr; gap:1.5rem; margin-bottom:1.5rem;">
@@ -582,6 +588,7 @@
             </div>
         </section>
 
+        <!-- PANNEAU D'ADMINISTRATION : GESTION COMPLETE (BI-DIRECTIONNELLE) -->
         <section id="adminDashboardScreen" class="card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:15px;">
                 <h2 data-i18n="admin_title" style="margin:0; font-size:1.5rem; font-weight: 850;">⚙️ Console d'Administration</h2>
@@ -591,6 +598,7 @@
                 </div>
             </div>
 
+            <!-- FORMULAIRE AJOUT & MODIFICATION QUESTION -->
             <div id="questionFormContainer" class="card hidden" style="background: rgba(10,15,29,0.95); border-color: var(--holcim-blue-light); margin-bottom: 2rem;">
                 <h3 id="formQuestionTitle" style="color: var(--holcim-blue-light); font-weight: 800;">Ajouter une Nouvelle Question</h3>
                 <input type="hidden" id="editQuestionIdx" value="">
@@ -621,21 +629,24 @@
                 </div>
             </div>
 
+            <!-- Onglets de la Console Admin -->
             <div class="tab-nav">
                 <button id="tabResultsBtn" class="tab-btn active">📊 Historique Audités</button>
                 <button id="tabQuestionsBtn" class="tab-btn">📋 Banque Questions</button>
             </div>
 
+            <!-- TABLEAU 1 : RÉSULTATS DES AUDITÉS (CORRIGÉ CONFORME GOOGLE SHEET) -->
             <div id="adminTableResults" class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Date d'Audit</th>
-                            <th>Nom & Prénom</th>
-                            <th>Domaine d'Évaluation</th>
-                            <th>Score Réalisé</th>
+                            <th>Horodatage</th>
+                            <th>Audité (Prénom Nom)</th>
+                            <th>Domaine Visé</th>
+                            <th>Questions Posées</th>
+                            <th>Score (%)</th>
                             <th>Verdict</th>
-                            <th>Durée</th>
+                            <th>Temps d'exécution</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -643,6 +654,7 @@
                 </table>
             </div>
 
+            <!-- TABLEAU 2 : BANQUE DE QUESTIONS ACTIVE -->
             <div id="adminTableQuestions" class="table-responsive hidden">
                 <table>
                     <thead>
@@ -660,6 +672,7 @@
             </div>
         </section>
 
+        <!-- ÉCRAN 3 : TEST ACTIF -->
         <section id="examScreen" class="card hidden">
             <div class="exam-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <div><span class="badge" id="lblDomaine" style="color:var(--holcim-blue-light); border:1.5px solid var(--holcim-blue-light);">--</span></div>
@@ -673,6 +686,7 @@
             <button id="btnNext" class="btn-primary" style="margin-top:2.5rem; width: 100%;" data-i18n="btn_submit">Soumettre la réponse</button>
         </section>
 
+        <!-- ÉCRAN 4 : SCORE & RAPPORT -->
         <section id="reportScreen" class="card hidden" style="text-align: center; max-width: 550px; margin: 2rem auto;">
             <h2 style="color:var(--success); font-size:1.8rem; margin-bottom:0.5rem;" data-i18n="eval_ended">📝 Évaluation Terminée</h2>
             <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:2rem;" data-i18n="eval_saved">Données sauvegardées de manière bidirectionnelle.</p>
@@ -685,11 +699,10 @@
 
     </main>
 
+    <!-- Pied de Page Slogans Officiels -->
     <footer>
         <div class="footer-logo-container">
             <svg class="logo-svg" viewBox="0 0 450 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <use href="#gradient-blue" />
-                <use href="#gradient-green" />
                 <g transform="translate(10, 10)">
                     <path d="M 50,20 A 30,30 0 0,1 80,50 L 80,65 L 60,65 L 60,50 A 10,10 0 0,0 50,40 A 10,10 0 0,0 40,50 L 40,65 L 20,65 L 20,50 A 30,30 0 0,1 50,20 Z" fill="url(#gradient-blue)" />
                     <path d="M 50,80 A 30,30 0 0,1 20,50 L 20,35 L 40,35 L 40,50 A 10,10 0 0,0 50,60 A 10,10 0 0,0 60,50 L 60,35 L 80,35 L 80,50 A 30,30 0 0,1 50,80 Z" fill="url(#gradient-green)" />
@@ -702,7 +715,7 @@
     </footer>
 
     <script>
-        // URL DE DEPLOIEMENT VALIDÉE ET SÉCURISÉE
+        // URL DE DEPLOIEMENT GOOGLE WEB APP SÉCURISÉE ET VALIDÉE
         const API = "https://script.google.com/macros/s/AKfycbwxt14pCM6khVQ6X3NwL95Qy4azLM1JXHZJOWxOibwtaK31Nym-EOvXckP8qtCnIaFW/exec";
         
         let serverQuestions = [];
@@ -714,13 +727,13 @@
         let timerQ, secQ, secG, timerG;
         let chartD, chartS;
 
-        // --- GESTION LOGO ---
+        // --- GESTION LOGO FALLBACK ---
         function handleLogoFallback() {
             document.getElementById('mainLogo').style.display = 'none';
             document.getElementById('backupLogo').style.display = 'block';
         }
 
-        // --- TRADUCTIONS ---
+        // --- TRADUCTIONS FR / AR ---
         const translations = {
             fr: {
                 main_title: "TABLEAU DE BORD KPI – RÉSULTATS DES TESTS CIAP PRO",
@@ -814,7 +827,7 @@
             applyLanguage(e.target.value);
         });
 
-        // --- THÈME ---
+        // --- GESTION DU THEME ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -852,7 +865,6 @@
             document.getElementById('dashboardScreen').classList.remove('hidden');
         });
 
-        // --- GESTION DES ONGLETS ADMIN ---
         function showTab(tabName) {
             const tabResults = document.getElementById('adminTableResults');
             const tabQuestions = document.getElementById('adminTableQuestions');
@@ -875,10 +887,14 @@
         document.getElementById('tabResultsBtn').addEventListener('click', () => showTab('results'));
         document.getElementById('tabQuestionsBtn').addEventListener('click', () => showTab('questions'));
 
-        // --- CHARGEMENT PRINCIPAL ---
+        // --- CHARGEMENT INITIAL PORTAIL ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            userNameFormatted = document.getElementById('firstName').value.trim() + " " + document.getElementById('lastName').value.trim().toUpperCase();
+            const rawFirst = document.getElementById('firstName').value.trim();
+            const rawLast = document.getElementById('lastName').value.trim().toUpperCase();
+            
+            // Format d'audité correct requis : "Prénom Nom" (Exemple : samir SAHRAOUI)
+            userNameFormatted = rawFirst.charAt(0).toUpperCase() + rawFirst.slice(1).toLowerCase() + " " + rawLast;
             
             document.getElementById('userProfile').innerText = "👤 " + userNameFormatted;
             document.getElementById('userProfile').style.display = "block";
@@ -888,7 +904,7 @@
             await refreshDataFromServer();
         });
 
-        // --- SYNCHRONISATION GET (LECTURE DES DONNÉES) ---
+        // --- SYNCHRONISATION GET (LIRE DEPUIS SHEET) ---
         async function refreshDataFromServer() {
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
@@ -908,12 +924,12 @@
             } catch(err) {
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
-                alert("Erreur d'accès à l'API de synchronisation Google.");
+                alert("Impossible de joindre la base de données de synchronisation.");
                 console.error(err);
             }
         }
 
-        // --- KPI ET DIAGRAMMES ---
+        // --- CALCUL DES METRIQUES & DIAGRAMMES ---
         function buildKPIs(history) {
             const total = history.length;
             document.getElementById('kpiTotal').innerText = total;
@@ -1005,12 +1021,12 @@
             });
         }
 
-        // --- METHODE DE SYNCHRONISATION POST CORRIGÉE (EVITE OPTIONS PREFLIGHT) ---
+        // --- METHODE POST OPTIMISÉE SANS PREFLIGHT CORS ---
         async function syncWithServer(payload) {
             document.getElementById('adminDashboardScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
             try {
-                // Utilisation exclusive du type 'text/plain' pour éviter la requête OPTIONS non supportée par Google Apps Script
+                // 'text/plain' force le navigateur à envoyer la requête directement à Google sans requêteOPTIONS préalable.
                 await fetch(API, {
                     method: 'POST',
                     mode: 'cors',
@@ -1021,7 +1037,7 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // Temporisation de sécurité d'écriture Cloud de 1,5s
+                // Pause de sécurité d'écriture Cloud
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 await refreshDataFromServer();
@@ -1030,19 +1046,18 @@
             } catch(e) {
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('adminDashboardScreen').classList.remove('hidden');
-                alert("Données transmises ! Reconnexion avec la base de données...");
+                alert("Synchronisation en cours, actualisation des résultats...");
                 await refreshDataFromServer();
             }
         }
 
-        // Action de suppression de question
+        // --- ACTIONS DIRECTES DE GESTION ADMINISTRATIVE ---
         window.deleteQuestion = async function(idx) {
             if(confirm("Confirmer la suppression définitive de cette question sur Google Sheets ?")) {
                 await syncWithServer({ action: "deleteQuestion", index: idx });
             }
         };
 
-        // Remplissage automatique pour modification
         window.editQuestion = function(idx) {
             const q = serverQuestions[idx];
             document.getElementById('formQuestionTitle').innerText = "Modifier la Question N°" + (idx + 1);
@@ -1057,7 +1072,6 @@
             window.scrollTo({top: 150, behavior: 'smooth'});
         };
 
-        // Suppression de l'historique
         window.deleteHistoryRow = async function(idx) {
             if(confirm("Confirmer la suppression définitive de ce résultat de la base ?")) {
                 await syncWithServer({ action: "deleteResult", index: idx });
@@ -1079,7 +1093,6 @@
             document.getElementById('questionFormContainer').classList.add('hidden');
         });
 
-        // Enregistrement / Ajout
         document.getElementById('saveQuestionBtn').addEventListener('click', async () => {
             const idxStr = document.getElementById('editQuestionIdx').value;
             const payload = {
@@ -1101,9 +1114,8 @@
             await syncWithServer(payload);
         });
 
-        // Construction dynamique des tableaux administratifs
+        // --- CONSTRUCTEUR DE TABLEAUX (ORDRE CONFORME REQUIS) ---
         function buildAdminTables(history, questions) {
-            // 1. Table des résultats
             const tResult = document.getElementById('adminResultsBody');
             tResult.innerHTML = "";
             history.forEach((r, idx) => {
@@ -1113,6 +1125,7 @@
                     <td style="opacity:0.7;">${r.horodatage || '--'}</td>
                     <td style="font-weight:bold;">${r.audite}</td>
                     <td>${r.domaine}</td>
+                    <td style="text-align:center; font-weight:bold;">${r.questionsPosees || '--'}</td>
                     <td style="font-weight:bold; color:var(--holcim-blue-light);">${r.score}%</td>
                     <td><span class="badge ${isPass}">${r.verdict}</span></td>
                     <td style="opacity:0.8;">${r.temps}</td>
@@ -1121,7 +1134,6 @@
                 tResult.appendChild(row);
             });
 
-            // 2. Table des questions active
             const tQuest = document.getElementById('adminQuestionsBody');
             tQuest.innerHTML = "";
             questions.forEach((q, idx) => {
@@ -1141,7 +1153,7 @@
             });
         }
 
-        // --- PROTOCOLE D'EXAMEN ACTIF ---
+        // --- ENTRAINEMENT & CONTROLE EXAMEN ---
         document.getElementById('btnStartExam').addEventListener('click', () => {
             const selectDom = document.getElementById('cfgDomaine').value;
             const sizeCfg = document.getElementById('cfgNb').value;
@@ -1220,7 +1232,7 @@
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
             try {
-                // Enregistrement synchrone en arrière-plan vers Sheets
+                // Envoi synchrone de l'évaluation
                 await fetch(API, {
                     method: 'POST',
                     mode: 'cors',
@@ -1242,7 +1254,7 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 await refreshDataFromServer();
             } catch(e) {
-                console.error("Échec d'enregistrement du rapport", e);
+                console.error("Erreur de synchronisation", e);
             }
 
             document.getElementById('loadingScreen').classList.add('hidden');
