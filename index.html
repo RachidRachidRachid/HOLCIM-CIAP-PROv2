@@ -3,79 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIAP - Holcim Professional Audit</title>
+    <title>CIAP PRO v2 - Holcim Performance & Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root[data-theme="dark"] { --bg-primary: #0b0f19; --bg-card: #141c2f; --text-main: #f8fafc; --accent: #ff5e13; --border-color: #22314d; --success: #10b981; }
-        body { margin: 0; font-family: sans-serif; background-color: var(--bg-primary); color: var(--text-main); }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: var(--bg-card); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-color); margin-bottom: 2rem; }
-        .btn-primary { background: var(--accent); color: white; border: none; padding: 1rem; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--border-color); padding: 1rem; border-radius: 8px; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 0.8rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+        :root {
+            --bg-primary: #080c14;
+            --bg-card: rgba(20, 30, 54, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #ff5e13;
+            --accent-hover: #e04f0a;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass-glow: rgba(255, 94, 19, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            background-image: radial-gradient(circle at top right, rgba(255, 94, 19, 0.05), transparent 400px);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
+
+        /* Effet Glassmorphism */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 0.6rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+
+        select, input {
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(11, 15, 25, 0.6);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        select:focus, input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px var(--glass-glow); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 5px 15px var(--glass-glow); }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--text-muted); }
+
+        /* Onglets d'administration */
+        .tab-nav { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.5rem 1rem; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+        /* KPIs */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(20, 30, 54, 0.8), rgba(11, 15, 25, 0.8));
+            padding: 1.8rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .stat-card h3 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        .stat-card p { font-size: 2.2rem; font-weight: 800; margin: 0.6rem 0 0; color: var(--accent); text-shadow: 0 0 10px var(--glass-glow); }
+
+        /* Graphiques */
+        .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .chart-wrapper { background: rgba(11, 15, 25, 0.5); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); min-height: 250px; }
+
+        /* Tableaux */
+        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(11, 15, 25, 0.4); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: rgba(20, 30, 54, 0.9); padding: 1rem; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-muted); }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        tr:hover { background: rgba(255, 94, 19, 0.03); }
+
+        .badge { padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* Questions de Test */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
+        .option-btn { background: rgba(11, 15, 25, 0.6); border: 1px solid var(--border-color); padding: 1.2rem; border-radius: 8px; text-align: left; color: inherit; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .option-btn:hover, .option-btn.selected { border-color: var(--accent); background: rgba(255, 94, 19, 0.08); box-shadow: 0 0 10px var(--glass-glow); }
+        
+        .progress-bar { background: var(--border-color); height: 6px; border-radius: 3px; overflow: hidden; margin: 1.5rem 0; }
+        #progressFill { background: var(--accent); height: 100%; width: 0%; transition: width 0.3s; }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login -->
+
+    <header class="navbar">
+        <div style="font-weight: 900; font-size: 1.4rem; letter-spacing: 1px;">🏭 HOLCIM <span style="color: var(--accent);">CIAP ANALYTICS</span></div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button id="adminLoginBtn" class="btn-secondary">⚙️ Admin Portal</button>
+            <div id="userProfile" style="font-weight: 500; color: var(--text-muted);">Non connecté</div>
+        </div>
+    </header>
+
+    <main class="container">
+        
         <section id="loginScreen" class="card">
-            <h2>Identification</h2>
+            <h2 style="margin-top:0; font-weight: 800; letter-spacing: -0.5px;">Espace d'Évaluation CIAP</h2>
+            <p style="color: var(--text-muted); margin-top:-10px; margin-bottom: 2rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
             <form id="loginForm">
-                <input type="text" id="lastName" placeholder="NOM" required style="width:100%; padding:10px; margin-bottom:10px;">
-                <input type="text" id="firstName" placeholder="Prénom" required style="width:100%; padding:10px; margin-bottom:10px;">
-                <button type="submit" class="btn-primary">Charger Audit & KPI</button>
+                <div class="form-group">
+                    <label>Nom de l'audité</label>
+                    <input type="text" id="lastName" required placeholder="Ex: BENALI" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" id="firstName" required placeholder="Ex: Mohamed">
+                </div>
+                <button type="submit" class="btn-primary">Charger l'application</button>
             </form>
         </section>
 
-        <!-- Dashboard -->
-        <section id="dashboardScreen" class="card hidden">
-            <h2>Tableau de bord</h2>
-            <div class="dashboard-grid">
-                <div class="stat-card"><h3>Audits</h3><p id="kpiTotal">0</p></div>
-                <div class="stat-card"><h3>Score Moyen</h3><p id="kpiAvgScore">0%</p></div>
+        <section id="adminAuthScreen" class="card hidden">
+            <h3>🔐 Accès Administration</h3>
+            <div class="form-group">
+                <label>Code PIN d'administration</label>
+                <input type="password" id="adminPin" placeholder="Entrez le code...">
             </div>
-            <button id="btnStart" class="btn-primary" style="margin-bottom:20px;">Démarrer un nouvel audit</button>
-            <div style="overflow-x:auto;">
+            <div style="display:flex; gap:1rem;">
+                <button id="verifyAdminBtn" class="btn-primary" style="flex:1;">Valider</button>
+                <button id="closeAdminAuthBtn" class="btn-secondary">Annuler</button>
+            </div>
+        </section>
+
+        <section id="loadingScreen" class="card hidden" style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <h3>Synchronisation sécurisée...</h3>
+            <p style="color:var(--text-muted);">Chargement en temps réel des données d'évaluation.</p>
+        </section>
+
+        <section id="dashboardScreen" class="hidden">
+            <div class="dashboard-grid">
+                <div class="stat-card"><h3>Audits Réalisés</h3><p id="kpiTotal">0</p></div>
+                <div class="stat-card"><h3>Conformité Globale</h3><p id="kpiPassRate" style="color: var(--success);">0%</p></div>
+                <div class="stat-card"><h3>Moyenne d'usine</h3><p id="kpiAvgScore">0%</p></div>
+                <div class="stat-card"><h3>Questions Actives</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h4 style="margin-top:0; color:var(--text-muted);">Conformité par Secteur</h4>
+                    <canvas id="domaineChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h4 style="margin-top:0; color:var(--text-muted);">Répartition des Décisions</h4>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">🛠️ Initialisation de la Session de Contrôle</h3>
+                <div class="setup-grid">
+                    <div class="form-group">
+                        <label>Périmètre d'audit</label>
+                        <select id="cfgDomaine"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre de questions requises</label>
+                        <select id="cfgNb">
+                            <option value="5" selected>5 Questions</option>
+                            <option value="10">10 Questions</option>
+                            <option value="20">20 Questions</option>
+                            <option value="all">Évaluation exhaustive</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="btnStartExam" class="btn-primary">Démarrer le protocole de test</button>
+            </div>
+        </section>
+
+        <section id="adminDashboardScreen" class="card hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                <h2 style="margin:0;">⚙️ Console d'Administration Supérieure</h2>
+                <button id="exitAdminBtn" class="btn-secondary">Quitter l'administration</button>
+            </div>
+
+            <div class="tab-nav">
+                <button id="tabResultsBtn" class="tab-btn active">📊 Historique des Audités (Tableau 1)</button>
+                <button id="tabQuestionsBtn" class="tab-btn">📋 Banque de Questions Active (Tableau 2)</button>
+            </div>
+
+            <div id="adminTableResults" class="table-responsive">
                 <table>
-                    <thead><tr><th>Date</th><th>Audité</th><th>Score</th><th>Verdict</th></tr></thead>
-                    <tbody id="historyBody"></tbody>
+                    <thead>
+                        <tr>
+                            <th>Date d'Audit</th>
+                            <th>Nom & Prénom</th>
+                            <th>Domaine d'Évaluation</th>
+                            <th>Score Réalisé</th>
+                            <th>Verdict de Conformité</th>
+                            <th>Durée</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminResultsBody"></tbody>
+                </table>
+            </div>
+
+            <div id="adminTableQuestions" class="table-responsive hidden">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Domaine</th>
+                            <th>Intitulé de la Question</th>
+                            <th>Options Possibles</th>
+                            <th>Index de Réponse</th>
+                            <th>Temps Limite</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminQuestionsBody"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Formulaire de soumission invisible -->
-        <iframe name="syncFrame" class="hidden"></iframe>
-        <form id="googleSyncForm" method="POST" action="https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec" target="syncFrame" class="hidden">
+        <section id="examScreen" class="card hidden">
+            <div class="exam-header">
+                <div><span class="badge badge-success" id="lblDomaine" style="color:var(--accent); border-color:var(--accent);">--</span></div>
+                <div><span id="questionTimer" class="badge badge-danger">--s</span></div>
+            </div>
+            <div class="progress-bar"><div id="progressFill"></div></div>
+            <div id="questionBox">
+                <h3 id="questionText" style="line-height:1.5; font-size:1.4rem; margin-top:1rem;">--</h3>
+                <div id="optionsContainer" class="options-grid"></div>
+            </div>
+            <button id="btnNext" class="btn-primary" style="margin-top:2.5rem;">Soumettre la réponse</button>
+        </section>
+
+        <section id="reportScreen" class="card hidden" style="text-align: center;">
+            <h2 style="color:var(--success)">📝 Protocole d'Évaluation Terminé</h2>
+            <p style="color:var(--text-muted)">Le cryptage de vos données de performance a été écrit avec succès.</p>
+            <div class="dashboard-grid" style="margin-top:2.5rem;">
+                <div class="card stat-card"><h3>Score Certifié</h3><p id="repScore">--%</p></div>
+                <div class="card stat-card"><h3>Verdict</h3><p id="repStatus">--</p></div>
+            </div>
+            <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1.5rem;">Fermer et retourner à la console</button>
+        </section>
+
+        <iframe name="syncFrame" class="hidden" style="display:none;"></iframe>
+        <form id="googleSyncForm" method="POST" action="https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec" target="syncFrame" class="hidden" style="display:none;">
             <input type="hidden" name="user" id="postUser">
             <input type="hidden" name="domaine" id="postDomaine">
             <input type="hidden" name="score" id="postScore">
             <input type="hidden" name="statut" id="postStatut">
             <input type="hidden" name="temps" id="postTemps">
         </form>
-    </div>
+    </main>
 
     <script>
         const API = "https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec";
         
+        let serverQuestions = [];
+        let rawHistory = [];
+        let userNameFormatted = "";
+        let currentExam = [];
+        let indexQ = 0;
+        let answersUser = [];
+        let timerQ, secQ, secG, timerG;
+        
+        let chartD, chartS; // Variables des instances Chart.js
+
+        // GESTIONNAIRE D'ACCÈS PORTAL ADMIN
+        document.getElementById('adminLoginBtn').addEventListener('click', () => {
+            document.getElementById('adminAuthScreen').classList.toggle('hidden');
+        });
+
+        document.getElementById('closeAdminAuthBtn').addEventListener('click', () => {
+            document.getElementById('adminAuthScreen').classList.add('hidden');
+        });
+
+        document.getElementById('verifyAdminBtn').addEventListener('click', () => {
+            const pin = document.getElementById('adminPin').value;
+            if(pin === "123admin") {
+                document.getElementById('adminAuthScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.add('hidden');
+                document.getElementById('adminDashboardScreen').classList.remove('hidden');
+                document.getElementById('adminPin').value = "";
+            } else {
+                alert("Code d'accès incorrect.");
+            }
+        });
+
+        document.getElementById('exitAdminBtn').addEventListener('click', () => {
+            document.getElementById('adminDashboardScreen').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+        });
+
+        // ONGLET INTERNE ADMIN
+        document.getElementById('tabResultsBtn').addEventListener('click', () => {
+            document.getElementById('tabResultsBtn').classList.add('active');
+            document.getElementById('tabQuestionsBtn').classList.remove('active');
+            document.getElementById('adminTableResults').classList.remove('hidden');
+            document.getElementById('adminTableQuestions').classList.add('hidden');
+        });
+
+        document.getElementById('tabQuestionsBtn').addEventListener('click', () => {
+            document.getElementById('tabQuestionsBtn').classList.add('active');
+            document.getElementById('tabResultsBtn').classList.remove('active');
+            document.getElementById('adminTableQuestions').classList.remove('hidden');
+            document.getElementById('adminTableResults').classList.add('hidden');
+        });
+
+        // SYNCHRONISATION GLOBALE API ET CALCUL KPI & GRAPHES
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const nom = document.getElementById('lastName').value.trim().toUpperCase();
+            const prenom = document.getElementById('firstName').value.trim();
+            userNameFormatted = prenom + " " + nom;
+            document.getElementById('userProfile').innerText = "👤 " + userNameFormatted;
+
             document.getElementById('loginScreen').classList.add('hidden');
-            const res = await fetch(API);
-            const data = await res.json();
-            
-            // Mise à jour KPI
-            document.getElementById('kpiTotal').innerText = data.resultats.length;
-            const avg = data.resultats.reduce((acc, curr) => acc + parseInt(curr.score), 0) / data.resultats.length;
-            document.getElementById('kpiAvgScore').innerText = Math.round(avg || 0) + "%";
-            
-            // Remplissage tableau
-            const tbody = document.getElementById('historyBody');
-            data.resultats.slice(-10).reverse().forEach(r => {
-                tbody.innerHTML += `<tr><td>${r.horodatage}</td><td>${r.audite}</td><td>${r.score}%</td><td>${r.verdict}</td></tr>`;
+            document.getElementById('loadingScreen').classList.remove('hidden');
+
+            try {
+                const res = await fetch(API);
+                const data = await res.json();
+                
+                serverQuestions = data.questions || [];
+                rawHistory = data.resultats || [];
+
+                // Remplir tableau de bord
+                buildKPIs(rawHistory);
+                buildCharts(rawHistory);
+                buildSelectors();
+                
+                // Remplir les deux tableaux d'administration
+                buildAdminTables(rawHistory, serverQuestions);
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+            } catch(err) {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                alert("Erreur réseau ou d'accès lors de l'extraction Google.");
+                console.error(err);
+            }
+        });
+
+        // CONFIGURATION DES KPIs ET STATS
+        function buildKPIs(history) {
+            const total = history.length;
+            document.getElementById('kpiTotal').innerText = total;
+
+            if (total === 0) return;
+
+            let correctSum = 0;
+            let conformes = 0;
+
+            history.forEach(r => {
+                const sc = parseInt(r.score) || 0;
+                correctSum += sc;
+                if (r.verdict === "CONFORME") conformes++;
             });
+
+            document.getElementById('kpiPassRate').innerText = Math.round((conformes / total) * 100) + "%";
+            document.getElementById('kpiAvgScore').innerText = Math.round(correctSum / total) + "%";
+            document.getElementById('statQuestionsCount').innerText = serverQuestions.length;
+        }
+
+        // COMPILATION INTERACTIVE DES GRAPHIQUES (CHART.JS)
+        function buildCharts(history) {
+            // Détruire les instances si elles existent déjà pour éviter le glitch au rechargement
+            if (chartD) chartD.destroy();
+            if (chartS) chartS.destroy();
+
+            // Graphique 1 : Scores par Domaine
+            const scoresParDomaine = {};
+            const countParDomaine = {};
+            history.forEach(r => {
+                if(!scoresParDomaine[r.domaine]) {
+                    scoresParDomaine[r.domaine] = 0;
+                    countParDomaine[r.domaine] = 0;
+                }
+                scoresParDomaine[r.domaine] += parseFloat(r.score) || 0;
+                countParDomaine[r.domaine]++;
+            });
+
+            const labelsD = Object.keys(scoresParDomaine);
+            const dataD = labelsD.map(label => Math.round(scoresParDomaine[label] / countParDomaine[label]));
+
+            const ctxDomaine = document.getElementById('domaineChart').getContext('2d');
+            chartD = new Chart(ctxDomaine, {
+                type: 'bar',
+                data: {
+                    labels: labelsD,
+                    datasets: [{
+                        label: 'Score Moyen (%)',
+                        data: dataD,
+                        backgroundColor: 'rgba(255, 94, 19, 0.6)',
+                        borderColor: '#ff5e13',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } } }
+                }
+            });
+
+            // Graphique 2 : Ratio de Conformité
+            let conforme = 0, reformer = 0;
+            history.forEach(r => {
+                if(r.verdict === "CONFORME") conforme++;
+                else reformer++;
+            });
+
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            chartS = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Conforme', 'À réformer'],
+                    datasets: [{
+                        data: [conforme, reformer],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                }
+            });
+        }
+
+        // CHARGEMENT DES COMPOSANTS DE CONFIGURATION
+        function buildSelectors() {
+            const domaines = new Set();
+            domaines.add("Tous les domaines (Mixte)");
+            serverQuestions.forEach(q => { if(q.domaine) domaines.add(q.domaine); });
+
+            const select = document.getElementById('cfgDomaine');
+            select.innerHTML = "";
+            domaines.forEach(d => {
+                const o = document.createElement('option');
+                o.value = d; o.innerText = d;
+                select.appendChild(o);
+            });
+        }
+
+        // REMPLISSAGE DES DEUX TABLEAUX D'ADMINISTRATION (TABLEAU 1 & TABLEAU 2)
+        function buildAdminTables(history, questions) {
+            // Tableau 1 : Résultats des audités
+            const tResult = document.getElementById('adminResultsBody');
+            tResult.innerHTML = "";
+            [...history].reverse().forEach(r => {
+                const row = document.createElement('tr');
+                const isPass = r.verdict === "CONFORME" ? "badge-success" : "badge-danger";
+                row.innerHTML = `
+                    <td style="opacity:0.7;">${r.horodatage}</td>
+                    <td style="font-weight:bold;">${r.audite}</td>
+                    <td>${r.domaine}</td>
+                    <td style="font-weight:bold; color:var(--accent);">${r.score}%</td>
+                    <td><span class="badge ${isPass}">${r.verdict}</span></td>
+                    <td style="opacity:0.8;">${r.temps}</td>
+                `;
+                tResult.appendChild(row);
+            });
+
+            // Tableau 2 : Banque de Questions Active
+            const tQuest = document.getElementById('adminQuestionsBody');
+            tQuest.innerHTML = "";
+            questions.forEach((q, idx) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight:bold; color:var(--accent);">${q.domaine}</td>
+                    <td>${q.question}</td>
+                    <td style="font-size:0.8rem; color:var(--text-muted);">${q.options.filter(Boolean).join(' | ')}</td>
+                    <td style="text-align:center; font-weight:bold;">Index ${q.correct}</td>
+                    <td style="opacity:0.8; text-align:center;">${q.temps}s</td>
+                `;
+                tQuest.appendChild(row);
+            });
+        }
+
+        // EXECUTION DE L'EXAMEN
+        document.getElementById('btnStartExam').addEventListener('click', () => {
+            const selectDom = document.getElementById('cfgDomaine').value;
+            const sizeCfg = document.getElementById('cfgNb').value;
+
+            let pool = (selectDom === "Tous les domaines (Mixte)") ? [...serverQuestions] : serverQuestions.filter(q => q.domaine === selectDom);
+            pool.sort(() => Math.random() - 0.5);
+
+            const limit = sizeCfg === "all" ? pool.length : parseInt(sizeCfg);
+            currentExam = pool.slice(0, limit);
+
+            if(currentExam.length === 0) {
+                alert("Aucune question trouvée.");
+                return;
+            }
+
+            indexQ = 0; answersUser = []; secG = 0;
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
             
+            timerG = setInterval(() => { secG++; }, 1000);
+            showQuestion();
+        });
+
+        function showQuestion() {
+            if (indexQ >= currentExam.length) { endExamAndSync(); return; }
+            clearInterval(timerQ);
+
+            const q = currentExam[indexQ];
+            document.getElementById('lblDomaine').innerText = q.domaine;
+            document.getElementById('questionText').innerText = q.question;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = "";
+
+            q.options.forEach((opt, idx) => {
+                if(opt && opt !== "") {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        btn.dataset.choice = idx;
+                    };
+                    container.appendChild(btn);
+                }
+            });
+
+            secQ = q.temps;
+            document.getElementById('questionTimer').innerText = `${secQ}s`;
+            timerQ = setInterval(() => {
+                secQ--;
+                document.getElementById('questionTimer').innerText = `${secQ}s`;
+                if(secQ <= 0) validateAnswer();
+            }, 1000);
+
+            document.getElementById('progressFill').style.width = `${(indexQ / currentExam.length) * 100}%`;
+        }
+
+        document.getElementById('btnNext').addEventListener('click', validateAnswer);
+
+        function validateAnswer() {
+            const sel = document.querySelector('.option-btn.selected');
+            answersUser.push(sel ? parseInt(sel.dataset.choice) : -1);
+            indexQ++;
+            showQuestion();
+        }
+
+        // ENVOI TRANSPARENT DANS L'IFRAME CACHÉE
+        function endExamAndSync() {
+            clearInterval(timerQ); clearInterval(timerG);
+
+            let correct = 0;
+            currentExam.forEach((q, i) => { if(answersUser[i] === q.correct) correct++; });
+            const score = Math.round((correct / currentExam.length) * 100);
+            const statut = score >= 75 ? "CONFORME" : "À REFORMER";
+            const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
+
+            // Préparation du formulaire
+            document.getElementById('postUser').value = userNameFormatted;
+            document.getElementById('postDomaine').value = document.getElementById('cfgDomaine').value;
+            document.getElementById('postScore').value = score;
+            document.getElementById('postStatut').value = statut;
+            document.getElementById('postTemps').value = tempsTotalStr;
+
+            // Envoi transparent sans page noire
+            document.getElementById('googleSyncForm').submit();
+
+            // Intégrer localement les nouvelles données pour que l'audité les voit sur ses graphes après le test
+            const now = new Date();
+            const dynamicDateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            rawHistory.push({
+                horodatage: dynamicDateStr,
+                audite: userNameFormatted,
+                domaine: document.getElementById('cfgDomaine').value,
+                score: score,
+                verdict: statut,
+                temps: tempsTotalStr
+            });
+
+            // Re-génération des KPI et des Graphiques
+            buildKPIs(rawHistory);
+            buildCharts(rawHistory);
+            buildAdminTables(rawHistory, serverQuestions);
+
+            // Redirection vers le score
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('reportScreen').classList.remove('hidden');
+
+            document.getElementById('repScore').innerText = score + "%";
+            document.getElementById('repStatus').innerText = statut;
+            document.getElementById('repStatus').style.color = (statut === "CONFORME") ? "var(--success)" : "var(--danger)";
+        }
+
+        document.getElementById('btnReturn').addEventListener('click', () => {
+            document.getElementById('reportScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
         });
     </script>
