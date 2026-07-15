@@ -2,9 +2,8 @@
 <html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CIAP PRO v2 - Holcim Performance & Analytics</title>
-    <!-- Chart.js pour les graphiques interactifs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -31,10 +30,10 @@
             background-color: var(--bg-primary);
             background-image: radial-gradient(circle at top right, rgba(255, 94, 19, 0.05), transparent 350px);
             color: var(--text-main);
+            /* Suppression des restrictions de hauteur pour libérer l'ascenseur */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
         }
 
         .navbar {
@@ -70,7 +69,7 @@
             flex-grow: 1;
         }
 
-        /* Glassmorphism rigide & responsive */
+        /* Glassmorphism stable sans blocage de scroll */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
@@ -180,7 +179,7 @@
             border-bottom: 2px solid var(--accent);
         }
 
-        /* Dashboard & Grid KPIs */
+        /* Grid KPIs */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -225,7 +224,7 @@
             .stat-card p { font-size: 2.2rem; }
         }
 
-        /* Graphiques Ajustés */
+        /* Graphiques */
         .charts-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -246,11 +245,10 @@
             padding: 1.2rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            height: 260px; /* Force la hauteur pour bloquer les sauts d'affichage */
+            height: 260px;
             position: relative;
         }
 
-        /* Configuration de session adaptative */
         .setup-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -265,7 +263,7 @@
             }
         }
 
-        /* Tableaux avec défilement propre */
+        /* Tableaux */
         .table-responsive {
             overflow-x: auto;
             border-radius: 8px;
@@ -280,7 +278,7 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 0.85rem;
-            min-width: 600px; /* Empêche le tassement des données */
+            min-width: 600px;
         }
 
         th {
@@ -307,7 +305,6 @@
         .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
         .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* Écran d'examen fixe et centré */
         #examScreen {
             max-width: 650px;
             margin: 1rem auto;
@@ -386,7 +383,6 @@
 
     <main class="container">
         
-        <!-- ÉCRAN 1 : CONNEXION SÉCURISÉE -->
         <section id="loginScreen" class="card">
             <h2 style="margin-top:0; font-weight: 800; font-size:1.5rem; margin-bottom:0.5rem;">Espace d'Évaluation CIAP</h2>
             <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Portail d'audit technique et suivi de conformité opérationnelle.</p>
@@ -403,7 +399,6 @@
             </form>
         </section>
 
-        <!-- PORTAL ADMIN : PIN CODE -->
         <section id="adminAuthScreen" class="card hidden">
             <h3 style="margin-bottom:1rem;">🔐 Accès Administration</h3>
             <div class="form-group">
@@ -416,14 +411,12 @@
             </div>
         </section>
 
-        <!-- CHARGEMENT -->
         <section id="loadingScreen" class="card hidden" style="text-align: center;">
             <div class="loading-spinner"></div>
             <h3 style="font-size:1.1rem; margin-top:1rem;">Synchronisation sécurisée...</h3>
             <p style="color:var(--text-muted); font-size:0.85rem;">Chargement en temps réel des données d'évaluation.</p>
         </section>
 
-        <!-- ÉCRAN 2 : PORTAIL PRINCIPAL (DASHBOARD ANALYTICS ET KPI) -->
         <section id="dashboardScreen" class="hidden">
             <div class="dashboard-grid">
                 <div class="stat-card"><h3>Audits</h3><p id="kpiTotal">0</p></div>
@@ -432,7 +425,6 @@
                 <div class="stat-card"><h3>Questions</h3><p id="statQuestionsCount" style="color: #38bdf8;">0</p></div>
             </div>
 
-            <!-- Graphiques Interactifs -->
             <div class="charts-container">
                 <div class="chart-wrapper">
                     <h4 style="margin-top:0; color:var(--text-muted); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase;">Conformité par Secteur</h4>
@@ -444,7 +436,6 @@
                 </div>
             </div>
 
-            <!-- Configuration de Session -->
             <div class="card">
                 <h3 style="margin-top:0; font-size:1.2rem; margin-bottom:1rem;">🛠️ Initialisation du Test</h3>
                 <div class="setup-grid">
@@ -466,7 +457,6 @@
             </div>
         </section>
 
-        <!-- PANNEAU D'ADMINISTRATION : 2 TABLEAUX DISTINCTS -->
         <section id="adminDashboardScreen" class="card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
                 <h2 style="margin:0; font-size:1.2rem;">⚙️ Console d'Administration</h2>
@@ -478,7 +468,6 @@
                 <button id="tabQuestionsBtn" class="tab-btn">📋 Banque Questions</button>
             </div>
 
-            <!-- TABLEAU 1 : RÉSULTATS DES AUDITÉS -->
             <div id="adminTableResults" class="table-responsive">
                 <table>
                     <thead>
@@ -495,7 +484,6 @@
                 </table>
             </div>
 
-            <!-- TABLEAU 2 : BANQUE DE QUESTIONS ACTIVE -->
             <div id="adminTableQuestions" class="table-responsive hidden">
                 <table>
                     <thead>
@@ -512,7 +500,6 @@
             </div>
         </section>
 
-        <!-- ÉCRAN 3 : TEST ACTIF (DESIGN NETTOYÉ ET ULTRA-RESPONSIVE) -->
         <section id="examScreen" class="card hidden">
             <div class="exam-header">
                 <div><span class="badge" id="lblDomaine" style="color:var(--accent); border:1px solid var(--accent);">--</span></div>
@@ -526,7 +513,6 @@
             <button id="btnNext" class="btn-primary" style="margin-top:2rem;">Soumettre la réponse</button>
         </section>
 
-        <!-- ÉCRAN 4 : SYNCHRONISATION & SCORE -->
         <section id="reportScreen" class="card hidden" style="text-align: center; max-width: 500px; margin: 2rem auto;">
             <h2 style="color:var(--success); font-size:1.5rem; margin-bottom:0.5rem;">📝 Évaluation Terminée</h2>
             <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Données enregistrées avec succès.</p>
@@ -537,11 +523,11 @@
             <button id="btnReturn" class="btn-secondary" style="width:100%; margin-top:1rem; padding: 0.8rem;">Retourner à la console</button>
         </section>
 
-        <!-- SÉCURITÉ TRANSMISSION CACHÉE -->
-        <iframe name="syncFrame" class="hidden" style="display:none;"></iframe>
+        <iframe name="syncFrame" id="syncFrame" class="hidden" style="display:none;"></iframe>
         <form id="googleSyncForm" method="POST" action="https://script.google.com/macros/s/AKfycbykgCjm-odtC8zV3p8qP312DtVEm5IEpTEdNXND9m6c51ECM2jnbSmvTowlA73nJ4ya/exec" target="syncFrame" class="hidden" style="display:none;">
             <input type="hidden" name="user" id="postUser">
             <input type="hidden" name="domaine" id="postDomaine">
+            <input type="hidden" name="nbQuestions" id="postNb">
             <input type="hidden" name="score" id="postScore">
             <input type="hidden" name="statut" id="postStatut">
             <input type="hidden" name="temps" id="postTemps">
@@ -784,7 +770,6 @@
             document.getElementById('dashboardScreen').classList.add('hidden');
             document.getElementById('examScreen').classList.remove('hidden');
             
-            // Défilement automatique vers le haut du test pour éviter les sauts d'affichage
             window.scrollTo({top: 0, behavior: 'smooth'});
             
             timerG = setInterval(() => { secG++; }, 1000);
@@ -845,14 +830,18 @@
             const statut = score >= 75 ? "CONFORME" : "À REFORMER";
             const tempsTotalStr = `${Math.floor(secG/60)}m ${secG%60}s`;
 
+            // Remplissage précis des variables du formulaire
             document.getElementById('postUser').value = userNameFormatted;
             document.getElementById('postDomaine').value = document.getElementById('cfgDomaine').value;
+            document.getElementById('postNb').value = currentExam.length;
             document.getElementById('postScore').value = score;
             document.getElementById('postStatut').value = statut;
             document.getElementById('postTemps').value = tempsTotalStr;
 
+            // Envoi synchrone vers le Sheets
             document.getElementById('googleSyncForm').submit();
 
+            // Enregistrement local dynamique
             const now = new Date();
             const dynamicDateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
